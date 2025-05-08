@@ -1,15 +1,12 @@
 import { use } from 'react';
+import { Grid, GridCell, GridColumn, Input } from '..';
 
 import GameContext from '../../lib/context/game-context';
-import Grid from '../Grid/Grid';
-import GridColumn from '../GridColumn/GridColumn';
-import GridCell from '../GridCell/GridCell';
-import Input from '../Input/Input';
 
 function Sudoku() {
   const {
     game: { game: board, editableCells },
-    updateCell,
+    update,
   } = use(GameContext);
 
   return (
@@ -36,7 +33,7 @@ function Sudoku() {
                       editable={editableCells[columnIndex][cellIndex]}
                       row={columnIndex}
                       col={cellIndex}
-                      onChange={updateCell}
+                      onChange={update}
                     />
                   </GridCell>
                 );

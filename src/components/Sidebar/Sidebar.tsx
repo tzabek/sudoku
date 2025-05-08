@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { capitalize } from 'lodash';
-
-import SolutionModal from '../SolutionModal/SolutionModal';
-import useSidebar from '../../lib/hooks/useSidebar';
+import { useSidebar } from '../../lib/hooks';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './Sidebar.css';
@@ -11,17 +9,9 @@ import './Sidebar.css';
 export default function Sidebar() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
-    actions: {
-      startGame,
-      saveGame,
-      clearBoard,
-      pauseGame,
-      resumeGame,
-      handleCheckSolution,
-    },
+    actions: { start, clear, pause, resume },
     data: {
       sidebar,
-      dialog,
       game,
       elapsed,
       isPaused,
@@ -37,11 +27,6 @@ export default function Sidebar() {
         ...(sidebar.isVisible ? ['toggled'] : []),
       ].join(' ')}
     >
-      <SolutionModal
-        ref={dialog}
-        {...{ game: game.game, solvedGame: game.solvedGame }}
-      />
-
       <Link
         to="/"
         id="show-sidebar"
@@ -83,13 +68,7 @@ export default function Sidebar() {
                   variant="outline-light"
                   size="sm"
                   className={isPaused ? 'resume-game' : 'pause-game'}
-                  onClick={() => {
-                    if (isPaused) {
-                      resumeGame(game);
-                    } else {
-                      pauseGame(game);
-                    }
-                  }}
+                  onClick={() => (isPaused ? resume(game) : pause(game))}
                 >
                   <FontAwesomeIcon
                     icon={isPaused ? icon.faGamepad : icon.faPause}
@@ -130,27 +109,15 @@ export default function Sidebar() {
                 >
                   <ul>
                     <li>
-                      <Link to="/" onClick={startGame}>
+                      <Link to="/" onClick={start}>
                         <FontAwesomeIcon icon={icon.faFlagCheckered} />
                         Start new
                       </Link>
                     </li>
                     <li>
-                      <Link to="/" onClick={() => saveGame(game)}>
-                        <FontAwesomeIcon icon={icon.faFloppyDisk} />
-                        Save game
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/" onClick={() => clearBoard(game)}>
+                      <Link to="/" onClick={() => clear(game)}>
                         <FontAwesomeIcon icon={icon.faBorderAll} />
                         Clear board
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/" onClick={handleCheckSolution}>
-                        <FontAwesomeIcon icon={icon.faClipboardQuestion} />
-                        Check solution
                       </Link>
                     </li>
                   </ul>

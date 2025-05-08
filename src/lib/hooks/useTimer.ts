@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
-import { TimerAction, TimerState } from '../types';
-import { createTimerStorage } from '../lib';
-import { INITIAL_TIMER } from '../constants';
+import {
+  createTimerStorage,
+  INITIAL_TIMER,
+  TimerAction,
+  TimerState,
+} from '../libs/timer';
 
 export function timerReducer(
   state: TimerState,

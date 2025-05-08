@@ -1,4 +1,4 @@
-import { CellProps } from '../../lib/types';
+import { CellProps } from '../../lib/libs/game';
 
 export default function GridColumn({ cellId, row, col, children }: CellProps) {
   return (

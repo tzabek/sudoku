@@ -1,5 +1,4 @@
 import { use, useCallback, useState, useRef, useEffect } from 'react';
-import { SidebarState } from '../types';
 import {
   FontAwesomeIcon,
   faBars,
@@ -18,10 +17,11 @@ import {
   faHeadset,
   faPause,
   faGamepad,
+  createSidebarStorage,
+  INITIAL_SIDEBAR_STATE,
+  SidebarState,
 } from '../libs/sidebar';
-import { createSidebarStorage } from '../lib';
-import { INITIAL_SIDEBAR_STATE } from '../constants';
-import { getElapsedTime } from '../utils';
+import { getElapsedTime } from '../libs/shared/utils';
 
 import GameContext from '../context/game-context';
 
@@ -29,16 +29,10 @@ export default function useSidebar() {
   const [sidebar, setSidebar] = useState(INITIAL_SIDEBAR_STATE);
   const [elapsed, setElapsed] = useState<string | null>(null);
 
-  const { game, startGame, saveGame, clearBoard, pauseGame, resumeGame } =
-    use(GameContext);
+  const { game, start, clear, pause, resume } = use(GameContext);
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPaused = game.status === 'paused';
-
-  const handleCheckSolution = () => {
-    dialogRef.current?.show();
-  };
 
   const handleLoadSidebar = useCallback(function handleLoadSidebar() {
     const storage = createSidebarStorage();
@@ -98,12 +92,10 @@ export default function useSidebar() {
   return {
     toggles: { toggleSidebar, toggleGameMenu },
     actions: {
-      startGame,
-      saveGame,
-      clearBoard,
-      pauseGame,
-      resumeGame,
-      handleCheckSolution,
+      start,
+      clear,
+      pause,
+      resume,
       handleSaveSidebar,
     },
     data: {
@@ -126,7 +118,6 @@ export default function useSidebar() {
         faPause,
         faGamepad,
       },
-      dialog: dialogRef,
       game,
       sidebar,
       elapsed,

@@ -1,11 +1,5 @@
-export function dedupeByKey<DTO extends object>(
-  list: DTO[],
-  key: keyof DTO
-): DTO[] {
-  const newList = list as DTO[];
-  const ids = newList.map((entry) => entry[key]);
-
-  return newList.filter((entry, index) => !ids.includes(entry[key], index + 1));
+export function foo(bar: unknown) {
+  return bar;
 }
 
 export function getElapsedTime(startTime: Date) {

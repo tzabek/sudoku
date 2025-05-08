@@ -1,12 +1,26 @@
-import { useCallback, useEffect, useReducer } from 'react';
-import { Board, GameActionProps, GameProps, IGameContext } from '../types';
-import { createGameStorage, createSudoku } from '../lib';
-import { INITIAL_SAVED_GAMES, INITIAL_SUDOKU } from '../constants';
+import { useEffect, useReducer } from 'react';
+import {
+  Board,
+  createGame,
+  createSudoku,
+  GameActionProps,
+  GameProps,
+  IGameContext,
+  INITIAL_SUDOKU,
+  loadGame,
+  loadGames,
+  saveGame,
+} from '../libs/game';
 
-export function sudokuReducer(state: GameProps, action: GameActionProps) {
+export function sudokuReducer(
+  state: GameProps,
+  action: GameActionProps
+): GameProps {
+  if (action.type === 'create-game') {
+    return createGame();
+  }
+
   if (action.type === 'start-game') {
-    // Update current game state
-    const storage = createGameStorage();
     const now = new Date().getTime();
     const currentGame: GameProps = JSON.parse(JSON.stringify(state));
 
@@ -17,120 +31,82 @@ export function sudokuReducer(state: GameProps, action: GameActionProps) {
         status: 'paused',
         timerActive: false,
       };
-      storage.set({ ...state, ...updatedGame });
+      saveGame({ ...state, ...updatedGame });
     }
 
-    // Create new game
-    const sudoku = createSudoku();
-
-    const { board: game, solution: solvedGame } = sudoku.generate();
-    const { editable: editableCells } = sudoku.start(game);
-
-    const id = crypto.randomUUID();
-    const updatedState: GameProps = {
-      id,
-      game,
-      solvedGame,
-      editableCells,
-      startedDate: now,
-      updatedDate: now,
-      completedDate: 0,
-      status: 'progress',
-      timerActive: true,
-    };
-
-    // Save game
-    return storage.set(updatedState);
+    return createGame();
   }
 
   if (action.type === 'load-game') {
     const { payload } = action;
 
-    const updatedState: GameProps = { ...state, ...payload };
-
-    return updatedState;
+    return { ...state, ...payload };
   }
 
   if (action.type === 'save-game') {
     const { game } = action.payload;
 
-    const updatedState: GameProps = { ...state, ...game };
-
-    return updatedState;
+    return { ...state, ...game };
   }
 
   if (action.type === 'update-cell') {
-    const storage = createGameStorage();
-
     const { game } = state;
     const { row, col, val } = action.payload;
 
     const copy: Board = game.map((r) => [...r]);
     copy[row][col] = val;
 
-    const updatedState: GameProps = storage.set({
+    return {
       ...state,
       game: copy,
       status: 'progress',
       timerActive: true,
       updatedDate: new Date().getTime(),
-    });
-
-    return updatedState;
+    };
   }
 
   if (action.type === 'clear-board') {
     const sudoku = createSudoku();
-    const storage = createGameStorage();
 
     const {
       game: { game: board, editableCells: editable },
     } = action.payload;
 
-    const copy: Board = sudoku.clear(board, editable).map((r) => [...r]);
-    const updatedState: GameProps = storage.set({
+    return {
       ...state,
-      game: copy,
+      game: sudoku.clear(board, editable).map((r) => [...r]),
       status: 'progress',
       timerActive: true,
       updatedDate: new Date().getTime(),
-    });
-
-    return updatedState;
+    };
   }
 
   if (action.type === 'pause-game') {
     const { game } = action.payload;
 
-    const storage = createGameStorage();
     const now = new Date().getTime();
 
-    const updatedState: GameProps = storage.set({
+    return {
       ...state,
       ...game,
       updatedDate: now,
       status: 'paused',
       timerActive: false,
-    });
-
-    return updatedState;
+    };
   }
 
   if (action.type === 'resume-game') {
     const { game } = action.payload;
 
-    const storage = createGameStorage();
     const now = new Date().getTime();
 
-    const updatedState: GameProps = storage.set({
+    return {
       ...state,
       ...game,
       updatedDate: now,
       status: 'progress',
       timerActive: true,
-    });
-
-    return updatedState;
+    };
   }
 
   return state;
@@ -139,88 +115,40 @@ export function sudokuReducer(state: GameProps, action: GameActionProps) {
 export function useSudoku() {
   const [state, dispatch] = useReducer(sudokuReducer, INITIAL_SUDOKU);
 
-  const handleStartGame = useCallback(
-    function handleStartGame() {
-      dispatch({ type: 'start-game' });
-    },
-    [dispatch]
-  );
-
-  const handleLoadGame = useCallback(
-    function handleLoadGame() {
-      const storage = createGameStorage();
-      const games = storage.getAll();
-
-      if (games) {
-        const { activeId } = games;
-
-        const game = storage.get(activeId);
-        const props = {
-          type: game ? 'load-game' : 'start-game',
-          ...(game ? { payload: game } : {}),
-        } as GameActionProps;
-
-        dispatch(props);
-      } else {
-        handleStartGame();
-      }
-    },
-    [dispatch, handleStartGame]
-  );
-
-  const handleSaveGame = (gameState: GameProps) => {
-    const storage = createGameStorage();
-    const updatedGame = storage.set(gameState);
-
-    if (updatedGame) {
-      dispatch({
-        type: 'save-game',
-        payload: { game: updatedGame },
-      });
-    }
-  };
-
-  const handleUpdateCell = (row: number, col: number, val: number) => {
-    dispatch({
-      type: 'update-cell',
-      payload: { row, col, val },
-    });
-  };
-
-  const handleClearBoard = (gameState: GameProps) => {
-    dispatch({
-      type: 'clear-board',
-      payload: { game: gameState },
-    });
-  };
-
-  const handlePauseGame = (gameState: GameProps) => {
-    dispatch({
-      type: 'pause-game',
-      payload: { game: gameState },
-    });
-  };
-
-  const handleResumeGame = (gameState: GameProps) => {
-    dispatch({
-      type: 'resume-game',
-      payload: { game: gameState },
-    });
-  };
-
   useEffect(() => {
-    handleLoadGame();
-  }, [handleLoadGame]);
+    const saved = loadGames();
+
+    if (saved) {
+      const { activeId: gameId } = saved;
+
+      const game = loadGame(gameId);
+
+      if (game) {
+        dispatch({ type: 'load-game', payload: game });
+      } else {
+        dispatch({ type: 'start-game' });
+      }
+    } else {
+      dispatch({ type: 'create-game' });
+    }
+  }, []);
+
+  // Save state to storage whenever it changes
+  useEffect(() => {
+    if (state.id) {
+      saveGame(state);
+    }
+  }, [state]);
 
   const contextValue: IGameContext = {
     game: state,
-    storage: createGameStorage().getAll() || INITIAL_SAVED_GAMES,
-    startGame: handleStartGame,
-    pauseGame: handlePauseGame,
-    resumeGame: handleResumeGame,
-    saveGame: handleSaveGame,
-    updateCell: handleUpdateCell,
-    clearBoard: handleClearBoard,
+    create: () => dispatch({ type: 'create-game' }),
+    start: () => dispatch({ type: 'start-game' }),
+    pause: () => dispatch({ type: 'pause-game', payload: { game: state } }),
+    resume: () => dispatch({ type: 'resume-game', payload: { game: state } }),
+    update: (row: number, col: number, val: number) =>
+      dispatch({ type: 'update-cell', payload: { row, col, val } }),
+    clear: () => dispatch({ type: 'clear-board', payload: { game: state } }),
   };
 
   return { contextValue };

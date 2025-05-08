@@ -1,4 +1,4 @@
-import { GridProps } from '../../lib/types';
+import { GridProps } from '../../lib/libs/game';
 
 import './Grid.css';
 
