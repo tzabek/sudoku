@@ -192,12 +192,11 @@ export function createGameStorage(): IGameStorage {
     set(gameState) {
       const { id } = gameState;
 
-      // eslint-disable-next-line no-nested-ternary
-      return this.getAll()
-        ? this.get(id)
-          ? this.update(gameState)
-          : this.add(gameState)
-        : this.create(gameState);
+      if (this.getAll()) {
+        return this.get(id) ? this.update(gameState) : this.add(gameState);
+      }
+
+      return this.create(gameState);
     },
 
     add(gameState) {

@@ -9,13 +9,13 @@ function loadGames() {
   return storage.getAll();
 }
 
-function saveGameState(updated: GameProps) {
+function saveGame(updated: GameProps) {
   const storage = createGameStorage();
 
   return storage.set(updated);
 }
 
-function loadGameState(gameId: string) {
+function loadGame(gameId: string) {
   const saved = loadGames();
 
   if (saved) {
@@ -27,7 +27,34 @@ function loadGameState(gameId: string) {
   return null;
 }
 
+function createGame() {
+  const sudoku = createSudoku();
+
+  const { board: game, solution: solvedGame } = sudoku.generate();
+  const { editable: editableCells } = sudoku.start(game);
+
+  const now = new Date().getTime();
+  const id = crypto.randomUUID();
+  const newState: GameProps = {
+    id,
+    game,
+    solvedGame,
+    editableCells,
+    startedDate: now,
+    updatedDate: now,
+    completedDate: 0,
+    status: 'progress',
+    timerActive: true,
+  };
+
+  return newState;
+}
+
 export function sudokuReducer(state: GameProps, action: GameActionProps) {
+  if (action.type === 'create-game') {
+    return createGame();
+  }
+
   if (action.type === 'start-game') {
     const now = new Date().getTime();
     const currentGame: GameProps = JSON.parse(JSON.stringify(state));
@@ -39,29 +66,10 @@ export function sudokuReducer(state: GameProps, action: GameActionProps) {
         status: 'paused',
         timerActive: false,
       };
-      saveGameState({ ...state, ...updatedGame });
+      saveGame({ ...state, ...updatedGame });
     }
 
-    // Create new game
-    const sudoku = createSudoku();
-
-    const { board: game, solution: solvedGame } = sudoku.generate();
-    const { editable: editableCells } = sudoku.start(game);
-
-    const id = crypto.randomUUID();
-    const updatedState: GameProps = {
-      id,
-      game,
-      solvedGame,
-      editableCells,
-      startedDate: now,
-      updatedDate: now,
-      completedDate: 0,
-      status: 'progress',
-      timerActive: true,
-    };
-
-    return updatedState;
+    return createGame();
   }
 
   if (action.type === 'load-game') {
@@ -161,7 +169,7 @@ export function useSudoku() {
     if (saved) {
       const { activeId: gameId } = saved;
 
-      const game = loadGameState(gameId);
+      const game = loadGame(gameId);
 
       if (game) {
         dispatch({ type: 'load-game', payload: game });
@@ -169,17 +177,20 @@ export function useSudoku() {
         dispatch({ type: 'start-game' });
       }
     } else {
-      dispatch({ type: 'start-game' });
+      dispatch({ type: 'create-game' });
     }
   }, []);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    saveGameState(state);
+    if (state.id) {
+      saveGame(state);
+    }
   }, [state]);
 
   const contextValue: IGameContext = {
     game: state,
+    create: () => dispatch({ type: 'create-game' }),
     start: () => dispatch({ type: 'start-game' }),
     pause: () => dispatch({ type: 'pause-game', payload: { game: state } }),
     resume: () => dispatch({ type: 'resume-game', payload: { game: state } }),

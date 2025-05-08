@@ -69,6 +69,7 @@ export interface IGameStorage {
 
 export interface IGameContext {
   game: GameProps;
+  create: (gameState: GameProps) => void;
   start: () => void;
   clear: (gameState: GameProps) => void;
   update: (row: number, col: number, val: number) => void;
@@ -89,6 +90,7 @@ export type GameProps = {
 };
 
 export type GameActionProps =
+  | { type: 'create-game' }
   | { type: 'start-game' }
   | { type: 'update-cell'; payload: { row: number; col: number; val: number } }
   | { type: 'load-game'; payload: GameProps }

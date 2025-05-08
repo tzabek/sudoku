@@ -53,6 +53,7 @@ export const INITIAL_SAVED_GAMES: SavedGames = {
 
 export const INITIAL_GAME_CONTEXT: IGameContext = {
   game: INITIAL_SUDOKU,
+  create: () => {},
   start: () => {},
   clear: () => {},
   update: () => {},
