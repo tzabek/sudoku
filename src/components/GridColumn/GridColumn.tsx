@@ -1,4 +1,4 @@
-import { ColumnProps } from '../../lib/types';
+import { ColumnProps } from '../../lib/libs/game';
 
 export default function GridColumn({ columnId, children }: ColumnProps) {
   return (

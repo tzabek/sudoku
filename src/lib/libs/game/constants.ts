@@ -1,36 +1,4 @@
-// eslint-disable-next-line import/no-cycle
-import {
-  Difficulty,
-  GameProps,
-  IGameContext,
-  ITimerReturn,
-  SavedGames,
-  SidebarState,
-  TimerState,
-} from './types';
-
-export const STORAGE = {
-  GAME: 'sudoku-progress',
-  SIDEBAR: 'sidebar-state',
-  TIMER: 'timer-state',
-};
-
-export const INITIAL_TIMER: TimerState = {
-  startDate: null,
-  pausedDate: null,
-  originalStartDate: null,
-  elapsedBeforePause: 0,
-  elapsedMs: 0,
-};
-
-export const INITIAL_TIMER_RETURN: ITimerReturn = {
-  elapsedMs: 0,
-  isRunning: false,
-  originalStartDate: 0,
-  startTimer: () => {},
-  pauseTimer: () => {},
-  resumeTimer: () => {},
-};
+import { Difficulty, GameProps, IGameContext, SavedGames } from '.';
 
 export const INITIAL_SUDOKU: GameProps = {
   id: '',
@@ -59,16 +27,6 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   update: () => {},
   pause: () => {},
   resume: () => {},
-};
-
-export const SIDEBAR_MENU = ['game', 'docs'] as const;
-
-export const INITIAL_SIDEBAR_STATE: SidebarState = {
-  isVisible: true,
-  menu: {
-    game: { isActive: true },
-    docs: { isActive: false },
-  },
 };
 
 export const DIFFICULTY = [

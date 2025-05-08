@@ -1,6 +1,5 @@
 import { createContext } from 'react';
-import { INITIAL_GAME_CONTEXT } from '../constants';
-import { IGameContext } from '../types';
+import { IGameContext, INITIAL_GAME_CONTEXT } from '../libs/game';
 
 const GameContext = createContext<IGameContext>(INITIAL_GAME_CONTEXT);
 

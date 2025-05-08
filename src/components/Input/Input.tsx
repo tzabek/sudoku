@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { InputProps } from '../../lib/types';
+import { InputProps } from '../../lib/libs/game';
 
 import './Input.css';
 

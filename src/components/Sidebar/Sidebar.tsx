@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { capitalize } from 'lodash';
-
-import SolutionModal from '../SolutionModal/SolutionModal';
-import useSidebar from '../../lib/hooks/useSidebar';
+import { useSidebar } from '../../lib/hooks';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './Sidebar.css';
@@ -14,7 +12,6 @@ export default function Sidebar() {
     actions: { start, clear, pause, resume, handleCheckSolution },
     data: {
       sidebar,
-      dialog,
       game,
       elapsed,
       isPaused,
@@ -30,11 +27,6 @@ export default function Sidebar() {
         ...(sidebar.isVisible ? ['toggled'] : []),
       ].join(' ')}
     >
-      <SolutionModal
-        ref={dialog}
-        {...{ game: game.game, solvedGame: game.solvedGame }}
-      />
-
       <Link
         to="/"
         id="show-sidebar"

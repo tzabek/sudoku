@@ -1,5 +1,4 @@
 import { use, useCallback, useState, useRef, useEffect } from 'react';
-import { SidebarState } from '../types';
 import {
   FontAwesomeIcon,
   faBars,
@@ -18,10 +17,11 @@ import {
   faHeadset,
   faPause,
   faGamepad,
+  createSidebarStorage,
+  INITIAL_SIDEBAR_STATE,
+  SidebarState,
 } from '../libs/sidebar';
-import { createSidebarStorage } from '../lib';
-import { INITIAL_SIDEBAR_STATE } from '../constants';
-import { getElapsedTime } from '../utils';
+import { getElapsedTime } from '../libs/shared/utils';
 
 import GameContext from '../context/game-context';
 
