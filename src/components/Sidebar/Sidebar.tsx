@@ -11,14 +11,7 @@ import './Sidebar.css';
 export default function Sidebar() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
-    actions: {
-      startGame,
-      saveGame,
-      clearBoard,
-      pauseGame,
-      resumeGame,
-      handleCheckSolution,
-    },
+    actions: { start, clear, pause, resume, handleCheckSolution },
     data: {
       sidebar,
       dialog,
@@ -83,13 +76,7 @@ export default function Sidebar() {
                   variant="outline-light"
                   size="sm"
                   className={isPaused ? 'resume-game' : 'pause-game'}
-                  onClick={() => {
-                    if (isPaused) {
-                      resumeGame(game);
-                    } else {
-                      pauseGame(game);
-                    }
-                  }}
+                  onClick={() => (isPaused ? resume(game) : pause(game))}
                 >
                   <FontAwesomeIcon
                     icon={isPaused ? icon.faGamepad : icon.faPause}
@@ -130,19 +117,13 @@ export default function Sidebar() {
                 >
                   <ul>
                     <li>
-                      <Link to="/" onClick={startGame}>
+                      <Link to="/" onClick={start}>
                         <FontAwesomeIcon icon={icon.faFlagCheckered} />
                         Start new
                       </Link>
                     </li>
                     <li>
-                      <Link to="/" onClick={() => saveGame(game)}>
-                        <FontAwesomeIcon icon={icon.faFloppyDisk} />
-                        Save game
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/" onClick={() => clearBoard(game)}>
+                      <Link to="/" onClick={() => clear(game)}>
                         <FontAwesomeIcon icon={icon.faBorderAll} />
                         Clear board
                       </Link>

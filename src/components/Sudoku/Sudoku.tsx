@@ -9,7 +9,7 @@ import Input from '../Input/Input';
 function Sudoku() {
   const {
     game: { game: board, editableCells },
-    updateCell,
+    update,
   } = use(GameContext);
 
   return (
@@ -36,7 +36,7 @@ function Sudoku() {
                       editable={editableCells[columnIndex][cellIndex]}
                       row={columnIndex}
                       col={cellIndex}
-                      onChange={updateCell}
+                      onChange={update}
                     />
                   </GridCell>
                 );

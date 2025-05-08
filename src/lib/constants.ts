@@ -53,13 +53,11 @@ export const INITIAL_SAVED_GAMES: SavedGames = {
 
 export const INITIAL_GAME_CONTEXT: IGameContext = {
   game: INITIAL_SUDOKU,
-  storage: INITIAL_SAVED_GAMES,
-  startGame: () => {},
-  saveGame: () => {},
-  clearBoard: () => {},
-  updateCell: () => {},
-  pauseGame: () => {},
-  resumeGame: () => {},
+  start: () => {},
+  clear: () => {},
+  update: () => {},
+  pause: () => {},
+  resume: () => {},
 };
 
 export const SIDEBAR_MENU = ['game', 'docs'] as const;

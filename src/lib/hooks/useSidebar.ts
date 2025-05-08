@@ -29,8 +29,7 @@ export default function useSidebar() {
   const [sidebar, setSidebar] = useState(INITIAL_SIDEBAR_STATE);
   const [elapsed, setElapsed] = useState<string | null>(null);
 
-  const { game, startGame, saveGame, clearBoard, pauseGame, resumeGame } =
-    use(GameContext);
+  const { game, start, clear, pause, resume } = use(GameContext);
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -98,11 +97,10 @@ export default function useSidebar() {
   return {
     toggles: { toggleSidebar, toggleGameMenu },
     actions: {
-      startGame,
-      saveGame,
-      clearBoard,
-      pauseGame,
-      resumeGame,
+      start,
+      clear,
+      pause,
+      resume,
       handleCheckSolution,
       handleSaveSidebar,
     },

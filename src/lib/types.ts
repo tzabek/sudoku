@@ -69,13 +69,11 @@ export interface IGameStorage {
 
 export interface IGameContext {
   game: GameProps;
-  storage: SavedGames;
-  startGame: () => void;
-  saveGame: (gameState: GameProps) => void;
-  clearBoard: (gameState: GameProps) => void;
-  updateCell: (row: number, col: number, val: number) => void;
-  pauseGame: (gameState: GameProps) => void;
-  resumeGame: (gameState: GameProps) => void;
+  start: () => void;
+  clear: (gameState: GameProps) => void;
+  update: (row: number, col: number, val: number) => void;
+  pause: (gameState: GameProps) => void;
+  resume: (gameState: GameProps) => void;
 }
 
 export type GameProps = {
