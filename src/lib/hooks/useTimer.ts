@@ -100,7 +100,7 @@ interface UseGameTimerReturn {
   reset: () => void;
 }
 
-export default function useGameTimer(): UseGameTimerReturn {
+export default function useTimer(): UseGameTimerReturn {
   const [state, dispatch] = useReducer(timerReducer, initialTimerState);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
