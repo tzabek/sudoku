@@ -31,13 +31,8 @@ export default function useSidebar() {
 
   const { game, start, clear, pause, resume } = use(GameContext);
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPaused = game.status === 'paused';
-
-  const handleCheckSolution = () => {
-    dialogRef.current?.show();
-  };
 
   const handleLoadSidebar = useCallback(function handleLoadSidebar() {
     const storage = createSidebarStorage();
@@ -101,7 +96,6 @@ export default function useSidebar() {
       clear,
       pause,
       resume,
-      handleCheckSolution,
       handleSaveSidebar,
     },
     data: {
@@ -124,7 +118,6 @@ export default function useSidebar() {
         faPause,
         faGamepad,
       },
-      dialog: dialogRef,
       game,
       sidebar,
       elapsed,

@@ -9,7 +9,7 @@ import './Sidebar.css';
 export default function Sidebar() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
-    actions: { start, clear, pause, resume, handleCheckSolution },
+    actions: { start, clear, pause, resume },
     data: {
       sidebar,
       game,
@@ -118,12 +118,6 @@ export default function Sidebar() {
                       <Link to="/" onClick={() => clear(game)}>
                         <FontAwesomeIcon icon={icon.faBorderAll} />
                         Clear board
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/" onClick={handleCheckSolution}>
-                        <FontAwesomeIcon icon={icon.faClipboardQuestion} />
-                        Check solution
                       </Link>
                     </li>
                   </ul>
