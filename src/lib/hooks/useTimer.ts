@@ -13,7 +13,7 @@ import {
 function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
   switch (action.type) {
     case 'create-timer':
-      return createTimer(action.id);
+      return createTimer(action.payload);
     case 'start-timer':
       return {
         ...state,
@@ -68,7 +68,9 @@ function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
 }
 
 export default function useTimer(props: UseTimerProps): ITimerReturn {
-  const { id } = props;
+  const {
+    game: { id, startedDate },
+  } = props;
 
   const [state, dispatch] = useReducer(timerReducer, INITIAL_TIMER);
 
@@ -86,20 +88,18 @@ export default function useTimer(props: UseTimerProps): ITimerReturn {
 
       if (wasRunning) {
         dispatch({ type: 'tick-timer', now: Date.now() });
-      } else {
-        dispatch({ type: 'resume-timer', now: Date.now() });
       }
     } else {
-      dispatch({ type: 'create-timer', id });
+      dispatch({ type: 'create-timer', payload: { id, startedDate } });
     }
-  }, [id]);
+  }, [id, startedDate]);
 
   // Save state to storage whenever it changes
   useEffect(() => {
-    if (state.id && state.id === id) {
+    if (state.id) {
       saveTimer(state);
     }
-  }, [id, state]);
+  }, [state]);
 
   // Timer ticking
   useEffect(() => {

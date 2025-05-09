@@ -1,5 +1,10 @@
 /* eslint-disable import/no-cycle */
-import { createTimerStorage, INITIAL_TIMER, TimerState } from '.';
+import {
+  CreateTimerProps,
+  createTimerStorage,
+  INITIAL_TIMER,
+  TimerState,
+} from '.';
 
 export function saveTimer(state: TimerState) {
   const storage = createTimerStorage();
@@ -13,14 +18,21 @@ export function loadTimer(): TimerState | null {
   return storage.get();
 }
 
-export function createTimer(id: string) {
-  const now = Date.now();
+export function createTimer(payload: CreateTimerProps) {
+  const { id, startedDate } = payload;
+
   const newTimer: TimerState = {
     ...INITIAL_TIMER,
     id,
-    startDate: now,
-    originalStartDate: now,
+    startDate: startedDate,
+    originalStartDate: startedDate,
   };
 
   return newTimer;
+}
+
+export function removeTimer() {
+  const storage = createTimerStorage();
+
+  storage.remove();
 }

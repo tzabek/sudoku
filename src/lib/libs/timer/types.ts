@@ -1,3 +1,5 @@
+import { GameProps } from '../game';
+
 export type TimerState = {
   id: string;
   startDate: number | null;
@@ -8,16 +10,25 @@ export type TimerState = {
 };
 
 export type UseTimerProps = {
-  id: string;
+  game: GameProps;
 };
 
 export interface ITimerStorage {
   get: () => TimerState | null;
   set: (timer: TimerState) => TimerState;
+  remove: () => void;
 }
 
+export type CreateTimerProps = {
+  id: GameProps['id'];
+  startedDate: GameProps['startedDate'];
+};
+
 export type TimerActionProps =
-  | { type: 'create-timer'; id: string }
+  | {
+      type: 'create-timer';
+      payload: CreateTimerProps;
+    }
   | { type: 'start-timer'; now: number }
   | { type: 'pause-timer'; now: number }
   | { type: 'resume-timer'; now: number }

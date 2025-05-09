@@ -18,5 +18,9 @@ export default function createTimerStorage(): ITimerStorage {
 
       return timer;
     },
+
+    remove() {
+      localStorage.removeItem(STORAGE.TIMER);
+    },
   };
 }

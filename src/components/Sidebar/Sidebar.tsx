@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { capitalize } from 'lodash';
-import { useSidebar, useTimer } from '../../lib/hooks';
+import { useSidebar } from '../../lib/hooks';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './Sidebar.css';
@@ -10,10 +10,9 @@ export default function Sidebar() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
     actions: { start, clear, pause, resume },
-    data: { sidebar, game, isPaused, icons },
+    data: { game, timer, sidebar, isPaused, icons },
   } = useSidebar();
   const { FontAwesomeIcon, ...icon } = icons;
-  const timer = useTimer({ id: game.id });
 
   return (
     <div
@@ -112,7 +111,13 @@ export default function Sidebar() {
                 >
                   <ul>
                     <li>
-                      <Link to="/" onClick={start}>
+                      <Link
+                        to="/"
+                        onClick={() => {
+                          start();
+                          timer.start();
+                        }}
+                      >
                         <FontAwesomeIcon icon={icon.faFlagCheckered} />
                         Start new
                       </Link>
