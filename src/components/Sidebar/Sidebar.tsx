@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { capitalize } from 'lodash';
 import { useSidebar } from '../../lib/hooks';
+import { formatTime } from '../../lib/libs/shared';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './Sidebar.css';
@@ -9,7 +10,7 @@ import './Sidebar.css';
 export default function Sidebar() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
-    actions: { start, clear, pause, resume },
+    actions: { start, pause, resume, clear },
     data: { game, timer, sidebar, isPaused, icons },
   } = useSidebar();
   const { FontAwesomeIcon, ...icon } = icons;
@@ -53,7 +54,8 @@ export default function Sidebar() {
                 <span>{capitalize(game.status)}</span>{' '}
               </span>
               <span className="game-timer">
-                <FontAwesomeIcon icon={icon.faClockFour} /> <span>TBC</span>
+                <FontAwesomeIcon icon={icon.faClockFour} />{' '}
+                <span>{formatTime(timer.elapsedMs)}</span>
               </span>
             </div>
             <div className="game-actions">
