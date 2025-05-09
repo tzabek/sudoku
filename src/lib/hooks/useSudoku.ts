@@ -11,6 +11,7 @@ import {
   loadGames,
   saveGame,
 } from '../libs/game';
+import { INITIAL_TIMER, saveTimer } from '../libs/timer';
 
 export function sudokuReducer(
   state: GameProps,
@@ -32,6 +33,7 @@ export function sudokuReducer(
         timerActive: false,
       };
       saveGame({ ...state, ...updatedGame });
+      saveTimer({ ...INITIAL_TIMER, id: currentGame.id });
     }
 
     return createGame();

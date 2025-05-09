@@ -13,7 +13,7 @@ export default function Sidebar() {
     data: { sidebar, game, isPaused, icons },
   } = useSidebar();
   const { FontAwesomeIcon, ...icon } = icons;
-  const timer = useTimer();
+  const timer = useTimer({ id: game.id });
 
   return (
     <div
@@ -112,13 +112,7 @@ export default function Sidebar() {
                 >
                   <ul>
                     <li>
-                      <Link
-                        to="/"
-                        onClick={() => {
-                          start();
-                          timer.start();
-                        }}
-                      >
+                      <Link to="/" onClick={start}>
                         <FontAwesomeIcon icon={icon.faFlagCheckered} />
                         Start new
                       </Link>

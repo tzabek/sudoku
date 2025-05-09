@@ -2,6 +2,7 @@
 import { ITimerReturn, TimerState } from '.';
 
 export const INITIAL_TIMER: TimerState = {
+  id: '',
   startDate: null,
   pausedDate: null,
   originalStartDate: null,
