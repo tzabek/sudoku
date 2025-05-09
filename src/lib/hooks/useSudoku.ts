@@ -11,6 +11,7 @@ import {
   loadGames,
   saveGame,
 } from '../libs/game';
+import { removeTimer } from '../libs/timer';
 
 export function sudokuReducer(
   state: GameProps,
@@ -21,7 +22,7 @@ export function sudokuReducer(
   }
 
   if (action.type === 'start-game') {
-    const now = new Date().getTime();
+    const now = Date.now();
     const currentGame: GameProps = JSON.parse(JSON.stringify(state));
 
     if (currentGame.id) {
@@ -34,7 +35,11 @@ export function sudokuReducer(
       saveGame({ ...state, ...updatedGame });
     }
 
-    return createGame();
+    const newGame = createGame();
+
+    removeTimer();
+
+    return newGame;
   }
 
   if (action.type === 'load-game') {
@@ -61,7 +66,7 @@ export function sudokuReducer(
       game: copy,
       status: 'progress',
       timerActive: true,
-      updatedDate: new Date().getTime(),
+      updatedDate: Date.now(),
     };
   }
 
@@ -77,14 +82,14 @@ export function sudokuReducer(
       game: sudoku.clear(board, editable).map((r) => [...r]),
       status: 'progress',
       timerActive: true,
-      updatedDate: new Date().getTime(),
+      updatedDate: Date.now(),
     };
   }
 
   if (action.type === 'pause-game') {
     const { game } = action.payload;
 
-    const now = new Date().getTime();
+    const now = Date.now();
 
     return {
       ...state,
@@ -98,7 +103,7 @@ export function sudokuReducer(
   if (action.type === 'resume-game') {
     const { game } = action.payload;
 
-    const now = new Date().getTime();
+    const now = Date.now();
 
     return {
       ...state,

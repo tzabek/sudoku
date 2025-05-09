@@ -31,7 +31,7 @@ export function createGame() {
   const { board: game, solution: solvedGame } = sudoku.generate();
   const { editable: editableCells } = sudoku.start(game);
 
-  const now = new Date().getTime();
+  const now = Date.now();
   const id = crypto.randomUUID();
   const newState: GameProps = {
     id,

@@ -42,7 +42,7 @@ export default function createGameStorage(): IGameStorage {
 
       const updatedGame: GameProps = {
         ...gameState,
-        updatedDate: new Date().getTime(),
+        updatedDate: Date.now(),
       };
 
       const { games } = savedData;
@@ -82,7 +82,7 @@ export default function createGameStorage(): IGameStorage {
       const updatedGame: GameProps = {
         ...game,
         ...gameState,
-        updatedDate: new Date().getTime(),
+        updatedDate: Date.now(),
       };
 
       const { games } = savedData;

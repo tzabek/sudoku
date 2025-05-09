@@ -25,6 +25,7 @@ import {
 } from '../libs/sidebar';
 
 import GameContext from '../context/game-context';
+import { useTimer } from '.';
 
 function sidebarReducer(
   state: SidebarState,
@@ -62,6 +63,7 @@ export default function useSidebar() {
 
   const { game, start, clear, pause, resume } = use(GameContext);
 
+  const timer = useTimer({ game });
   const isPaused = game.status === 'paused';
 
   // Load sidebar
@@ -82,6 +84,7 @@ export default function useSidebar() {
     actions: { start, clear, pause, resume },
     data: {
       game,
+      timer,
       sidebar: state,
       isPaused,
       icons: {
