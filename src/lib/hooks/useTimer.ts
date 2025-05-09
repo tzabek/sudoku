@@ -69,7 +69,7 @@ function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
 
 export default function useTimer(props: UseTimerProps): ITimerReturn {
   const {
-    game: { id, startedDate },
+    game: { id, startedDate, timerActive },
   } = props;
 
   const [state, dispatch] = useReducer(timerReducer, INITIAL_TIMER);
@@ -100,6 +100,13 @@ export default function useTimer(props: UseTimerProps): ITimerReturn {
       saveTimer(state);
     }
   }, [state]);
+
+  // Resume timer when sudoku board changes
+  useEffect(() => {
+    if (timerActive) {
+      dispatch({ type: 'resume-timer', now: Date.now() });
+    }
+  }, [timerActive]);
 
   // Timer ticking
   useEffect(() => {
