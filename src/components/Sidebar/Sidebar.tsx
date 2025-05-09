@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { capitalize } from 'lodash';
-import { useSidebar } from '../../lib/hooks';
+import { useSidebar, useTimer } from '../../lib/hooks';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './Sidebar.css';
@@ -10,14 +10,10 @@ export default function Sidebar() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
     actions: { start, clear, pause, resume },
-    data: {
-      sidebar,
-      game,
-      elapsed,
-      isPaused,
-      icons: { FontAwesomeIcon, ...icon },
-    },
+    data: { sidebar, game, isPaused, icons },
   } = useSidebar();
+  const { FontAwesomeIcon, ...icon } = icons;
+  const timer = useTimer();
 
   return (
     <div
@@ -58,8 +54,7 @@ export default function Sidebar() {
                 <span>{capitalize(game.status)}</span>{' '}
               </span>
               <span className="game-timer">
-                <FontAwesomeIcon icon={icon.faClockFour} />{' '}
-                <span>{elapsed}</span>
+                <FontAwesomeIcon icon={icon.faClockFour} /> <span>TBC</span>
               </span>
             </div>
             <div className="game-actions">
@@ -68,7 +63,15 @@ export default function Sidebar() {
                   variant="outline-light"
                   size="sm"
                   className={isPaused ? 'resume-game' : 'pause-game'}
-                  onClick={() => (isPaused ? resume(game) : pause(game))}
+                  onClick={() => {
+                    if (isPaused) {
+                      resume(game);
+                      timer.resume();
+                    } else {
+                      pause(game);
+                      timer.pause();
+                    }
+                  }}
                 >
                   <FontAwesomeIcon
                     icon={isPaused ? icon.faGamepad : icon.faPause}
@@ -109,7 +112,13 @@ export default function Sidebar() {
                 >
                   <ul>
                     <li>
-                      <Link to="/" onClick={start}>
+                      <Link
+                        to="/"
+                        onClick={() => {
+                          start();
+                          timer.start();
+                        }}
+                      >
                         <FontAwesomeIcon icon={icon.faFlagCheckered} />
                         Start new
                       </Link>

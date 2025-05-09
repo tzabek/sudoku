@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { ReactNode } from 'react';
 import { DIFFICULTY, GAME_STATUS } from '.';
 

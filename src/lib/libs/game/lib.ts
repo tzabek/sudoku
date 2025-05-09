@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { createGameStorage, createSudoku, GameProps } from '.';
 
 export function loadGames() {

@@ -1,4 +1,4 @@
-import { use, useCallback, useState, useRef, useEffect } from 'react';
+import { use, useEffect, useReducer } from 'react';
 import {
   FontAwesomeIcon,
   faBars,
@@ -17,88 +17,72 @@ import {
   faHeadset,
   faPause,
   faGamepad,
-  createSidebarStorage,
-  INITIAL_SIDEBAR_STATE,
+  INITIAL_SIDEBAR,
   SidebarState,
+  SidebarActionProps,
+  saveSidebar,
+  loadSidebar,
 } from '../libs/sidebar';
-import { getElapsedTime } from '../libs/shared/utils';
 
 import GameContext from '../context/game-context';
 
+function sidebarReducer(
+  state: SidebarState,
+  action: SidebarActionProps
+): SidebarState {
+  switch (action.type) {
+    case 'load-sidebar': {
+      return loadSidebar() || INITIAL_SIDEBAR;
+    }
+    case 'toggle-menu': {
+      return saveSidebar({
+        ...state,
+        menu: {
+          docs: { ...state.menu.docs },
+          game: {
+            isActive: !state.menu.game.isActive,
+          },
+        },
+      });
+    }
+    case 'toggle-sidebar': {
+      return saveSidebar({
+        ...state,
+        isVisible: !state.isVisible,
+      });
+    }
+    default: {
+      return state;
+    }
+  }
+}
+
 export default function useSidebar() {
-  const [sidebar, setSidebar] = useState(INITIAL_SIDEBAR_STATE);
-  const [elapsed, setElapsed] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(sidebarReducer, INITIAL_SIDEBAR);
 
   const { game, start, clear, pause, resume } = use(GameContext);
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPaused = game.status === 'paused';
 
-  const handleLoadSidebar = useCallback(function handleLoadSidebar() {
-    const storage = createSidebarStorage();
-    const data = storage.get();
-
-    setSidebar(data ?? storage.set(INITIAL_SIDEBAR_STATE));
+  useEffect(() => {
+    dispatch({ type: 'load-sidebar' });
   }, []);
 
-  const handleSaveSidebar = (data: SidebarState) => {
-    const storage = createSidebarStorage();
-    setSidebar(storage.set(data));
-  };
-
-  const toggleSidebar = () => {
-    handleSaveSidebar({
-      ...sidebar,
-      isVisible: !sidebar.isVisible,
-    });
-  };
-
-  const toggleGameMenu = () => {
-    handleSaveSidebar({
-      ...sidebar,
-      menu: {
-        docs: { ...sidebar.menu.docs },
-        game: {
-          isActive: !sidebar.menu.game.isActive,
-        },
-      },
-    });
-  };
-
+  // Save state to storage whenever it changes
   useEffect(() => {
-    handleLoadSidebar();
-  }, [handleLoadSidebar]);
-
-  const handleTimer = useCallback(function handleTimer(time: string) {
-    setElapsed(time);
-  }, []);
-
-  useEffect(() => {
-    const { timerActive, startedDate } = game;
-
-    if (timerActive) {
-      intervalRef.current = setInterval(() => {
-        handleTimer(getElapsedTime(new Date(startedDate)));
-      }, 1000);
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [game, handleTimer]);
+    saveSidebar(state);
+  }, [state]);
 
   return {
-    toggles: { toggleSidebar, toggleGameMenu },
-    actions: {
-      start,
-      clear,
-      pause,
-      resume,
-      handleSaveSidebar,
+    toggles: {
+      toggleSidebar: () => dispatch({ type: 'toggle-sidebar' }),
+      toggleGameMenu: () => dispatch({ type: 'toggle-menu' }),
     },
+    actions: { start, clear, pause, resume },
     data: {
+      game,
+      sidebar: state,
+      isPaused,
       icons: {
         FontAwesomeIcon,
         faBars,
@@ -118,10 +102,6 @@ export default function useSidebar() {
         faPause,
         faGamepad,
       },
-      game,
-      sidebar,
-      elapsed,
-      isPaused,
     },
   };
 }

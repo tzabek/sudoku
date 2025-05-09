@@ -22,7 +22,8 @@ export interface ITimerReturn {
   elapsedMs: number;
   isRunning: boolean;
   originalStartDate: number | null;
-  startTimer: () => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
+  start: () => void;
+  pause: () => void;
+  resume: () => void;
+  reset: () => void;
 }

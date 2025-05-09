@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { SIDEBAR_MENU } from '.';
 
 export type SidebarMenu = (typeof SIDEBAR_MENU)[number];
@@ -11,3 +12,8 @@ export interface ISidebarStorage {
   get: () => SidebarState | null;
   set: (sidebar: SidebarState) => SidebarState;
 }
+
+export type SidebarActionProps =
+  | { type: 'load-sidebar' }
+  | { type: 'toggle-sidebar' }
+  | { type: 'toggle-menu' };

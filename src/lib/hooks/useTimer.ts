@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useRef } from 'react';
 import { STORAGE } from '../libs/shared';
+import { ITimerReturn } from '../libs/timer';
 
 interface TimerState {
   startDate: number | null;
@@ -90,17 +91,7 @@ function loadTimerState(): Partial<TimerState> | null {
   }
 }
 
-interface UseGameTimerReturn {
-  elapsedMs: number;
-  isRunning: boolean;
-  originalStartDate: number | null;
-  start: () => void;
-  pause: () => void;
-  resume: () => void;
-  reset: () => void;
-}
-
-export default function useTimer(): UseGameTimerReturn {
+export default function useTimer(): ITimerReturn {
   const [state, dispatch] = useReducer(timerReducer, initialTimerState);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
