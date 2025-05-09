@@ -1,24 +1,14 @@
 import { useEffect, useReducer, useRef } from 'react';
-import { STORAGE } from '../libs/shared';
-import { ITimerReturn } from '../libs/timer';
+import {
+  INITIAL_TIMER,
+  ITimerReturn,
+  loadTimer,
+  saveTimer,
+  TimerActionProps,
+  TimerState,
+} from '../libs/timer';
 
-interface TimerState {
-  startDate: number | null;
-  pausedDate: number | null;
-  originalStartDate: number | null;
-  elapsedBeforePause: number;
-  elapsedMs: number;
-}
-
-type TimerAction =
-  | { type: 'start-timer'; now: number }
-  | { type: 'pause-timer'; now: number }
-  | { type: 'resume-timer'; now: number }
-  | { type: 'tick-timer'; now: number }
-  | { type: 'reset-timer' }
-  | { type: 'load-timer'; state: Partial<TimerState> };
-
-function timerReducer(state: TimerState, action: TimerAction): TimerState {
+function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
   switch (action.type) {
     case 'start-timer':
       return {
@@ -52,14 +42,6 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
         ...state,
         elapsedMs: state.elapsedBeforePause + (action.now - state.startDate),
       };
-    case 'reset-timer':
-      return {
-        startDate: null,
-        pausedDate: null,
-        originalStartDate: null,
-        elapsedBeforePause: 0,
-        elapsedMs: 0,
-      };
     case 'load-timer':
       return {
         ...state,
@@ -70,36 +52,15 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
   }
 }
 
-const initialTimerState: TimerState = {
-  startDate: null,
-  pausedDate: null,
-  originalStartDate: null,
-  elapsedBeforePause: 0,
-  elapsedMs: 0,
-};
-
-function saveTimerState(state: Partial<TimerState>) {
-  localStorage.setItem(STORAGE.TIMER, JSON.stringify(state));
-}
-
-function loadTimerState(): Partial<TimerState> | null {
-  try {
-    const raw = localStorage.getItem(STORAGE.TIMER);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
 export default function useTimer(): ITimerReturn {
-  const [state, dispatch] = useReducer(timerReducer, initialTimerState);
+  const [state, dispatch] = useReducer(timerReducer, INITIAL_TIMER);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isRunning = state.startDate !== null && state.pausedDate === null;
 
-  // Load from localStorage on first mount
+  // Load timer
   useEffect(() => {
-    const saved = loadTimerState();
+    const saved = loadTimer();
     if (saved) {
       dispatch({ type: 'load-timer', state: saved });
 
@@ -111,9 +72,9 @@ export default function useTimer(): ITimerReturn {
     }
   }, []);
 
-  // Save state to localStorage whenever it changes
+  // Save state to storage whenever it changes
   useEffect(() => {
-    saveTimerState(state);
+    saveTimer(state);
   }, [state]);
 
   // Timer ticking
@@ -140,10 +101,6 @@ export default function useTimer(): ITimerReturn {
   const start = () => dispatch({ type: 'start-timer', now: Date.now() });
   const pause = () => dispatch({ type: 'pause-timer', now: Date.now() });
   const resume = () => dispatch({ type: 'resume-timer', now: Date.now() });
-  const reset = () => {
-    localStorage.removeItem(STORAGE.TIMER);
-    dispatch({ type: 'reset-timer' });
-  };
 
   return {
     elapsedMs: state.elapsedMs,
@@ -152,6 +109,5 @@ export default function useTimer(): ITimerReturn {
     start,
     pause,
     resume,
-    reset,
   };
 }

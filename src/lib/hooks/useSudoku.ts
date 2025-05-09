@@ -115,6 +115,7 @@ export function sudokuReducer(
 export function useSudoku() {
   const [state, dispatch] = useReducer(sudokuReducer, INITIAL_SUDOKU);
 
+  // Load game
   useEffect(() => {
     const saved = loadGames();
 
@@ -133,7 +134,7 @@ export function useSudoku() {
     }
   }, []);
 
-  // Save state to storage whenever it changes
+  // Save game to storage whenever it changes
   useEffect(() => {
     if (state.id) {
       saveGame(state);

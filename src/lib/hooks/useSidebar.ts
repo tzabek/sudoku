@@ -32,7 +32,7 @@ function sidebarReducer(
 ): SidebarState {
   switch (action.type) {
     case 'load-sidebar': {
-      return loadSidebar() || INITIAL_SIDEBAR;
+      return loadSidebar();
     }
     case 'toggle-menu': {
       return saveSidebar({
@@ -64,11 +64,12 @@ export default function useSidebar() {
 
   const isPaused = game.status === 'paused';
 
+  // Load sidebar
   useEffect(() => {
     dispatch({ type: 'load-sidebar' });
   }, []);
 
-  // Save state to storage whenever it changes
+  // Save sidebar to storage whenever it changes
   useEffect(() => {
     saveSidebar(state);
   }, [state]);

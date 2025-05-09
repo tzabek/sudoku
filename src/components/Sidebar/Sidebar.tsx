@@ -149,10 +149,11 @@ export default function Sidebar() {
         </div>
         <div className="sidebar-footer">
           <Link to="/">
-            <FontAwesomeIcon icon={icon.faBell} />
             <Badge pill bg="primary">
-              3
-            </Badge>
+              <FontAwesomeIcon icon={icon.faGamepad} />{' '}
+              {sidebar.games.games.length}
+            </Badge>{' '}
+            games so far
           </Link>
         </div>
       </nav>
