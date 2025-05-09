@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { ITimerReturn, TimerState } from '.';
 
 export const INITIAL_TIMER: TimerState = {
@@ -12,7 +13,7 @@ export const INITIAL_TIMER_RETURN: ITimerReturn = {
   elapsedMs: 0,
   isRunning: false,
   originalStartDate: 0,
-  startTimer: () => {},
-  pauseTimer: () => {},
-  resumeTimer: () => {},
+  start: () => {},
+  pause: () => {},
+  resume: () => {},
 };

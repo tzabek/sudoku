@@ -11,7 +11,7 @@ export interface ITimerStorage {
   set: (timer: Partial<TimerState>) => Partial<TimerState>;
 }
 
-export type TimerAction =
+export type TimerActionProps =
   | { type: 'start-timer'; now: number }
   | { type: 'pause-timer'; now: number }
   | { type: 'resume-timer'; now: number }
@@ -22,7 +22,7 @@ export interface ITimerReturn {
   elapsedMs: number;
   isRunning: boolean;
   originalStartDate: number | null;
-  startTimer: () => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
+  start: () => void;
+  pause: () => void;
+  resume: () => void;
 }

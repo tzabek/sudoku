@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import {
-  createTimerStorage,
   INITIAL_TIMER,
-  TimerAction,
+  ITimerReturn,
+  loadTimer,
+  saveTimer,
+  TimerActionProps,
   TimerState,
 } from '../libs/timer';
 
-export function timerReducer(
-  state: TimerState,
-  action: TimerAction
-): TimerState {
+function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
   switch (action.type) {
     case 'start-timer':
       return {
@@ -53,70 +52,36 @@ export function timerReducer(
   }
 }
 
-export function useTimer() {
+export default function useTimer(): ITimerReturn {
   const [state, dispatch] = useReducer(timerReducer, INITIAL_TIMER);
-
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const isRunning = state.startDate !== null && state.pausedDate === null;
 
-  const handleTickTimer = useCallback(
-    function handleTickTimer() {
-      dispatch({ type: 'tick-timer', now: Date.now() });
-    },
-    [dispatch]
-  );
+  // Load timer
+  useEffect(() => {
+    const saved = loadTimer();
+    if (saved) {
+      dispatch({ type: 'load-timer', state: saved });
 
-  const handleLoadTimer = useCallback(
-    function handleLoadTimer() {
-      const storage = createTimerStorage();
-      const saved = storage.get();
-
-      if (saved) {
-        dispatch({ type: 'load-timer', state: saved });
-
-        const wasRunning = !!(saved.startDate && !saved.pausedDate);
-        if (wasRunning) {
-          handleTickTimer();
-        }
+      // If game was running, continue ticking
+      const wasRunning = saved.startDate && !saved.pausedDate;
+      if (wasRunning) {
+        dispatch({ type: 'tick-timer', now: Date.now() });
       }
-    },
-    [dispatch, handleTickTimer]
-  );
+    }
+  }, []);
 
-  const handleStartTimer = useCallback(
-    function handleStartTimer() {
-      dispatch({ type: 'start-timer', now: Date.now() });
-    },
-    [dispatch]
-  );
-
-  const handlePauseTimer = useCallback(
-    function handlePauseTimer() {
-      dispatch({ type: 'pause-timer', now: Date.now() });
-    },
-    [dispatch]
-  );
-
-  const handleResumeTimer = useCallback(
-    function handleResumeTimer() {
-      dispatch({ type: 'resume-timer', now: Date.now() });
-    },
-    [dispatch]
-  );
-
+  // Save state to storage whenever it changes
   useEffect(() => {
-    handleLoadTimer();
-  }, [handleLoadTimer]);
-
-  useEffect(() => {
-    const storage = createTimerStorage();
-    storage.set(state);
+    saveTimer(state);
   }, [state]);
 
+  // Timer ticking
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        handleTickTimer();
+        dispatch({ type: 'tick-timer', now: Date.now() });
       }, 100);
 
       return () => {
@@ -131,14 +96,18 @@ export function useTimer() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [handleTickTimer, isRunning]);
+  }, [isRunning]);
+
+  const start = () => dispatch({ type: 'start-timer', now: Date.now() });
+  const pause = () => dispatch({ type: 'pause-timer', now: Date.now() });
+  const resume = () => dispatch({ type: 'resume-timer', now: Date.now() });
 
   return {
     elapsedMs: state.elapsedMs,
     isRunning,
     originalStartDate: state.originalStartDate,
-    startTimer: handleStartTimer,
-    pauseTimer: handlePauseTimer,
-    resumeTimer: handleResumeTimer,
+    start,
+    pause,
+    resume,
   };
 }

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Difficulty, GameProps, IGameContext, SavedGames } from '.';
 
 export const INITIAL_SUDOKU: GameProps = {

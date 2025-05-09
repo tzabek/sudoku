@@ -1,9 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { useSudoku } from './lib/hooks/useSudoku';
+import { useSudoku } from './lib/hooks';
+import { Sidebar, Sudoku } from './components';
 
 import GameContext from './lib/context/game-context';
-import Sudoku from './components/Sudoku/Sudoku';
-import Sidebar from './components/Sidebar/Sidebar';
 
 function App() {
   const { contextValue } = useSudoku();
