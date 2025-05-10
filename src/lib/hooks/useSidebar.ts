@@ -21,16 +21,20 @@ import {
   SidebarActionProps,
   saveSidebar,
   loadSidebar,
+  createSidebar,
 } from '../libs/sidebar';
+import { useTimer } from '.';
 
 import GameContext from '../context/game-context';
-import { useTimer } from '.';
 
 function sidebarReducer(
   state: SidebarState,
   action: SidebarActionProps
 ): SidebarState {
   switch (action.type) {
+    case 'create-sidebar': {
+      return createSidebar();
+    }
     case 'load-sidebar': {
       const saved = loadSidebar();
 
@@ -75,21 +79,19 @@ export default function useSidebar() {
   useEffect(() => {
     const saved = loadSidebar();
 
-    if (saved) {
+    if (saved.id) {
       dispatch({ type: 'load-sidebar' });
+    } else {
+      dispatch({ type: 'create-sidebar' });
     }
   }, []);
 
   // Save sidebar to storage whenever it changes
   useEffect(() => {
-    console.log(state);
     if (state.id) {
-      console.log(state.id);
       saveSidebar(state);
     }
   }, [state]);
-
-  useEffect(() => {});
 
   return {
     toggles: {

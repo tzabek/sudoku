@@ -18,3 +18,18 @@ export function saveSidebar(updated: SidebarState) {
 
   return storage.set(updated);
 }
+
+export function createSidebar() {
+  const id = crypto.randomUUID();
+  const newState: SidebarState = {
+    id,
+    isVisible: true,
+    menu: {
+      game: { isActive: true },
+      docs: { isActive: false },
+    },
+    games: createGameStorage().getAll() || INITIAL_SAVED_GAMES,
+  };
+
+  return newState;
+}

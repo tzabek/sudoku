@@ -18,5 +18,6 @@ export interface ISidebarStorage {
 
 export type SidebarActionProps =
   | { type: 'load-sidebar' }
+  | { type: 'create-sidebar' }
   | { type: 'toggle-sidebar' }
   | { type: 'toggle-menu' };

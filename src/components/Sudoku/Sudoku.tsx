@@ -1,15 +1,24 @@
-import { use } from 'react';
-import { Input } from '..';
+import { ChangeEvent, use } from 'react';
 
 import GameContext from '../../lib/context/game-context';
 
 import './Sudoku.scss';
 
 function Sudoku() {
+  const ctx = use(GameContext);
   const {
     game: { game: board, editableCells },
     update,
-  } = use(GameContext);
+  } = ctx;
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    row: number,
+    col: number
+  ) => {
+    const num = Number(e.target.value);
+    update(row, col, Number.isNaN(num) ? 0 : num);
+  };
 
   return (
     <form>
@@ -20,12 +29,15 @@ function Sudoku() {
 
             return (
               <div className="cell" key={key}>
-                <Input
-                  value={value}
-                  editable={editableCells[rowIdx][colIdx]}
-                  row={rowIdx}
-                  col={colIdx}
-                  onChange={update}
+                <input
+                  id={`${rowIdx}-${colIdx}`}
+                  type="text"
+                  maxLength={1}
+                  value={value === 0 ? '' : value}
+                  onChange={(e) => handleInputChange(e, rowIdx, colIdx)}
+                  readOnly={!editableCells[rowIdx][colIdx]}
+                  data-row={rowIdx}
+                  data-col={colIdx}
                 />
               </div>
             );
