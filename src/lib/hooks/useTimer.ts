@@ -48,15 +48,18 @@ function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
         startDate: action.now,
         pausedDate: null,
       };
-    case 'tick-timer':
+    case 'tick-timer': {
       if (!state.startDate || state.pausedDate) {
         return state;
       }
 
+      const elapsed = state.elapsedBeforePause + (action.now - state.startDate);
+
       return {
         ...state,
-        elapsedMs: state.elapsedBeforePause + (action.now - state.startDate),
+        elapsedMs: elapsed,
       };
+    }
     case 'load-timer':
       return {
         ...state,

@@ -17,23 +17,32 @@ import {
   faHeadset,
   faPause,
   faGamepad,
-  INITIAL_SIDEBAR,
   SidebarState,
   SidebarActionProps,
   saveSidebar,
   loadSidebar,
+  createSidebar,
 } from '../libs/sidebar';
+import { useTimer } from '.';
 
 import GameContext from '../context/game-context';
-import { useTimer } from '.';
 
 function sidebarReducer(
   state: SidebarState,
   action: SidebarActionProps
 ): SidebarState {
   switch (action.type) {
+    case 'create-sidebar': {
+      return createSidebar();
+    }
     case 'load-sidebar': {
-      return loadSidebar();
+      const saved = loadSidebar();
+
+      if (saved) {
+        return loadSidebar();
+      }
+
+      return state;
     }
     case 'toggle-menu': {
       return saveSidebar({
@@ -59,7 +68,7 @@ function sidebarReducer(
 }
 
 export default function useSidebar() {
-  const [state, dispatch] = useReducer(sidebarReducer, INITIAL_SIDEBAR);
+  const [state, dispatch] = useReducer(sidebarReducer, undefined, loadSidebar);
 
   const { game, start, clear, pause, resume } = use(GameContext);
 
@@ -68,12 +77,20 @@ export default function useSidebar() {
 
   // Load sidebar
   useEffect(() => {
-    dispatch({ type: 'load-sidebar' });
+    const saved = loadSidebar();
+
+    if (saved.id) {
+      dispatch({ type: 'load-sidebar' });
+    } else {
+      dispatch({ type: 'create-sidebar' });
+    }
   }, []);
 
   // Save sidebar to storage whenever it changes
   useEffect(() => {
-    saveSidebar(state);
+    if (state.id) {
+      saveSidebar(state);
+    }
   }, [state]);
 
   return {

@@ -1,30 +1,5 @@
 /* eslint-disable import/no-cycle */
-import { ReactNode } from 'react';
 import { DIFFICULTY, GAME_STATUS } from '.';
-
-export type GridProps = {
-  children: ReactNode;
-};
-
-export type ColumnProps = {
-  columnId: string;
-  children: ReactNode;
-};
-
-export type CellProps = {
-  cellId: string;
-  row: number;
-  col: number;
-  children: ReactNode;
-};
-
-export interface InputProps {
-  value: number;
-  editable: boolean;
-  row: number;
-  col: number;
-  onChange: (row: number, col: number, value: number) => void;
-}
 
 export type Board = number[][];
 export type Editable = boolean[][];
@@ -100,4 +75,9 @@ export type SavedGames = {
 export type SolutionModalProps = {
   game: Board;
   solvedGame: Board;
+};
+
+export type SelectedCellProps = {
+  row: number;
+  col: number;
 };

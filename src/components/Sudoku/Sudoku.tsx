@@ -1,48 +1,50 @@
-import { use } from 'react';
-import { Grid, GridCell, GridColumn, Input } from '..';
+import { ChangeEvent, use } from 'react';
 
 import GameContext from '../../lib/context/game-context';
 
+import './Sudoku.scss';
+
 function Sudoku() {
+  const ctx = use(GameContext);
   const {
     game: { game: board, editableCells },
     update,
-  } = use(GameContext);
+  } = ctx;
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    row: number,
+    col: number
+  ) => {
+    const num = Number(e.target.value);
+    update(row, col, Number.isNaN(num) ? 0 : num);
+  };
 
   return (
-    <div className="container">
-      <Grid>
-        {board.map((column, columnIndex) => {
-          const columnId = crypto.randomUUID();
+    <form>
+      <section id="board" className="sudoku-board">
+        {board.map((row, rowIdx) =>
+          row.map((value, colIdx) => {
+            const key = crypto.randomUUID();
 
-          return (
-            <GridColumn columnId={columnId} key={columnId}>
-              {column.map((value, cellIndex) => {
-                const cellId = crypto.randomUUID();
-
-                return (
-                  <GridCell
-                    key={cellId}
-                    cellId={cellId}
-                    row={columnIndex}
-                    col={cellIndex}
-                  >
-                    <Input
-                      key={cellId}
-                      value={value}
-                      editable={editableCells[columnIndex][cellIndex]}
-                      row={columnIndex}
-                      col={cellIndex}
-                      onChange={update}
-                    />
-                  </GridCell>
-                );
-              })}
-            </GridColumn>
-          );
-        })}
-      </Grid>
-    </div>
+            return (
+              <div className="cell" key={key}>
+                <input
+                  id={`${rowIdx}-${colIdx}`}
+                  type="text"
+                  maxLength={1}
+                  value={value === 0 ? '' : value}
+                  onChange={(e) => handleInputChange(e, rowIdx, colIdx)}
+                  readOnly={!editableCells[rowIdx][colIdx]}
+                  data-row={rowIdx}
+                  data-col={colIdx}
+                />
+              </div>
+            );
+          })
+        )}
+      </section>
+    </form>
   );
 }
 

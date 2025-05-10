@@ -5,6 +5,7 @@ import { SavedGames } from '../game';
 export type SidebarMenu = (typeof SIDEBAR_MENU)[number];
 
 export type SidebarState = {
+  id: string;
   isVisible: boolean;
   menu: { [K in SidebarMenu]: { isActive: boolean } };
   games: SavedGames;
@@ -17,5 +18,6 @@ export interface ISidebarStorage {
 
 export type SidebarActionProps =
   | { type: 'load-sidebar' }
+  | { type: 'create-sidebar' }
   | { type: 'toggle-sidebar' }
   | { type: 'toggle-menu' };
