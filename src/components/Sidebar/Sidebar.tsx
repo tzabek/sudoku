@@ -5,7 +5,7 @@ import { useSidebar } from '../../lib/hooks';
 import { formatTime } from '../../lib/libs/shared';
 
 import 'bootstrap/dist/css/bootstrap.css';
-import './Sidebar.css';
+import './Sidebar.scss';
 
 export default function Sidebar() {
   const {

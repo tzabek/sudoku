@@ -17,7 +17,6 @@ import {
   faHeadset,
   faPause,
   faGamepad,
-  INITIAL_SIDEBAR,
   SidebarState,
   SidebarActionProps,
   saveSidebar,
@@ -33,7 +32,13 @@ function sidebarReducer(
 ): SidebarState {
   switch (action.type) {
     case 'load-sidebar': {
-      return loadSidebar();
+      const saved = loadSidebar();
+
+      if (saved) {
+        return loadSidebar();
+      }
+
+      return state;
     }
     case 'toggle-menu': {
       return saveSidebar({
@@ -59,7 +64,7 @@ function sidebarReducer(
 }
 
 export default function useSidebar() {
-  const [state, dispatch] = useReducer(sidebarReducer, INITIAL_SIDEBAR);
+  const [state, dispatch] = useReducer(sidebarReducer, undefined, loadSidebar);
 
   const { game, start, clear, pause, resume } = use(GameContext);
 
@@ -68,13 +73,23 @@ export default function useSidebar() {
 
   // Load sidebar
   useEffect(() => {
-    dispatch({ type: 'load-sidebar' });
+    const saved = loadSidebar();
+
+    if (saved) {
+      dispatch({ type: 'load-sidebar' });
+    }
   }, []);
 
   // Save sidebar to storage whenever it changes
   useEffect(() => {
-    saveSidebar(state);
+    console.log(state);
+    if (state.id) {
+      console.log(state.id);
+      saveSidebar(state);
+    }
   }, [state]);
+
+  useEffect(() => {});
 
   return {
     toggles: {

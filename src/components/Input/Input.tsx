@@ -1,8 +1,6 @@
 import { ChangeEvent } from 'react';
 import { InputProps } from '../../lib/libs/game';
 
-import './Input.css';
-
 function Input(props: InputProps) {
   const { value, editable, row, col, onChange } = props;
 
@@ -14,13 +12,11 @@ function Input(props: InputProps) {
   return (
     <input
       id={`${row}-${col}`}
-      name="sudoku-cell"
       type="text"
       maxLength={1}
-      className={['cell-input', ...(!editable ? ['prefilled'] : [])].join(' ')}
       value={value === 0 ? '' : value}
       onChange={handleInputChange}
-      disabled={!editable}
+      readOnly={!editable}
     />
   );
 }
