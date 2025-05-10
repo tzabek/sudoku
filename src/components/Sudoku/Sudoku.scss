@@ -1,12 +1,13 @@
+$grid-size: 9;
+
 #board {
   padding: 7px;
   background: black;
   display: grid;
-  grid-template-rows: repeat(9, auto);
-  grid-template-columns: repeat(9, auto);
+  grid-template-rows: repeat($grid-size, auto);
+  grid-template-columns: repeat($grid-size, auto);
   column-gap: 2px;
   row-gap: 2px;
-  margin-bottom: 70px;
 }
 
 .cell {
@@ -48,6 +49,18 @@
 
     &:focus {
       background: lightblue;
+    }
+  }
+}
+
+@for $x from 0 through ($grid-size - 1) {
+  @for $y from 0 through ($grid-size - 1) {
+    .sudoku-board:has(.cell[data-x='#{$x}'][data-y='#{$y}']:focus-within) {
+      .cell[data-x='#{$x}'],
+      .cell[data-y='#{$y}'] {
+        background: rgb(214, 233, 240);
+        transition: background 0.3s ease, color 0.3s ease;
+      }
     }
   }
 }

@@ -28,7 +28,7 @@ function Sudoku() {
             const key = crypto.randomUUID();
 
             return (
-              <div className="cell" key={key}>
+              <div className="cell" key={key} data-x={colIdx} data-y={rowIdx}>
                 <input
                   id={`${rowIdx}-${colIdx}`}
                   type="text"
