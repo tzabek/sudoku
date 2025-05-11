@@ -11,6 +11,7 @@ export const INITIAL_SUDOKU: GameProps = {
   completedDate: 0,
   status: 'new',
   timerActive: false,
+  timer: null,
 };
 
 export const GAME_STATUS = ['new', 'progress', 'paused', 'completed'] as const;

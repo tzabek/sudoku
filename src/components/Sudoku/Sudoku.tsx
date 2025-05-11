@@ -1,4 +1,4 @@
-import { ChangeEvent, use } from 'react';
+import { ChangeEvent, use, useRef } from 'react';
 
 import GameContext from '../../lib/context/game-context';
 
@@ -10,6 +10,8 @@ function Sudoku() {
     game: { game: board, editableCells },
     update,
   } = ctx;
+
+  const ref = useRef<HTMLInputElement | null>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -26,10 +28,20 @@ function Sudoku() {
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
             const key = crypto.randomUUID();
+            const classes = [
+              'cell',
+              ...(!editableCells[rowIdx][colIdx] ? ['prefilled'] : []),
+            ].join(' ');
 
             return (
-              <div className="cell" key={key} data-x={colIdx} data-y={rowIdx}>
+              <div
+                className={classes}
+                key={key}
+                data-x={colIdx}
+                data-y={rowIdx}
+              >
                 <input
+                  ref={ref}
                   id={`${rowIdx}-${colIdx}`}
                   type="text"
                   maxLength={1}

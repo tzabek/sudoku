@@ -33,6 +33,5 @@ export function createTimer(payload: CreateTimerProps) {
 
 export function removeTimer() {
   const storage = createTimerStorage();
-
   storage.remove();
 }

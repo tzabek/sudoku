@@ -1,5 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { DIFFICULTY, GAME_STATUS } from '.';
+import { TimerState } from '../timer';
 
 export type Board = number[][];
 export type Editable = boolean[][];
@@ -55,6 +56,7 @@ export type GameProps = {
   completedDate: number;
   status: GameStatus;
   timerActive: boolean;
+  timer: TimerState | null;
 };
 
 export type GameActionProps =

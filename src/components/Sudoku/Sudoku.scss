@@ -42,20 +42,28 @@ $grid-size: 9;
     text-align: center;
     background: transparent;
     transition: background 0.3s ease, color 0.3s ease;
+  }
 
-    &:hover {
-      background: rgb(214, 233, 240);
-    }
+  &:hover {
+    background: rgb(214, 233, 240);
+  }
 
-    &:focus {
-      background: lightblue;
+  &.prefilled {
+    background: darken(#f0f0f0, 5%);
+
+    > input {
+      font-weight: bold;
+      color: #222;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
     }
   }
 }
 
 @for $x from 0 through ($grid-size - 1) {
   @for $y from 0 through ($grid-size - 1) {
-    .sudoku-board:has(.cell[data-x='#{$x}'][data-y='#{$y}']:focus-within) {
+    .sudoku-board:has(
+        .cell[data-x='#{$x}'][data-y='#{$y}']:not(.prefilled):focus-within
+      ) {
       .cell[data-x='#{$x}'],
       .cell[data-y='#{$y}'] {
         background: rgb(214, 233, 240);
