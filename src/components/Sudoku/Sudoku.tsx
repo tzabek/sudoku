@@ -1,4 +1,6 @@
 import { ChangeEvent, use, useRef } from 'react';
+import { SudokuCell } from '..';
+import { SudokuCellRef } from '../../lib/libs/game';
 
 import GameContext from '../../lib/context/game-context';
 
@@ -11,7 +13,7 @@ function Sudoku() {
     update,
   } = ctx;
 
-  const ref = useRef<HTMLInputElement | null>(null);
+  const sudokuCellRef = useRef<SudokuCellRef>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -24,34 +26,25 @@ function Sudoku() {
 
   return (
     <form>
+      <section id="board-hint" />
       <section id="board" className="sudoku-board">
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
             const key = crypto.randomUUID();
-            const classes = [
-              'cell',
-              ...(!editableCells[rowIdx][colIdx] ? ['prefilled'] : []),
-            ].join(' ');
 
             return (
-              <div
-                className={classes}
+              <SudokuCell
                 key={key}
-                data-x={colIdx}
-                data-y={rowIdx}
-              >
-                <input
-                  ref={ref}
-                  id={`${rowIdx}-${colIdx}`}
-                  type="text"
-                  maxLength={1}
-                  value={value === 0 ? '' : value}
-                  onChange={(e) => handleInputChange(e, rowIdx, colIdx)}
-                  readOnly={!editableCells[rowIdx][colIdx]}
-                  data-row={rowIdx}
-                  data-col={colIdx}
-                />
-              </div>
+                ref={sudokuCellRef}
+                col={colIdx}
+                row={rowIdx}
+                editable={editableCells}
+                value={value}
+                onUpdate={(e) => handleInputChange(e, rowIdx, colIdx)}
+                onActivateHint={() =>
+                  sudokuCellRef.current?.activateHint(rowIdx, colIdx)
+                }
+              />
             );
           })
         )}
@@ -59,5 +52,7 @@ function Sudoku() {
     </form>
   );
 }
+
+Sudoku.displayName = 'Sudoku';
 
 export default Sudoku;
