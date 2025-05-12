@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Suspense } from 'react';
 import { useSudoku } from './lib/hooks';
 import { Sidebar, Sudoku } from './components';
 
@@ -11,12 +10,11 @@ function App() {
   return (
     <GameContext value={contextValue}>
       <BrowserRouter>
-        <Suspense fallback="Loading...">
-          <Sidebar />
-        </Suspense>
-        <Routes>
-          <Route path="/" element={<Sudoku />} />
-        </Routes>
+        <Sidebar>
+          <Routes>
+            <Route path="/" element={<Sudoku />} />
+          </Routes>
+        </Sidebar>
       </BrowserRouter>
     </GameContext>
   );

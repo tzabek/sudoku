@@ -5,6 +5,7 @@ import { TimerState } from '../timer';
 
 export type Board = number[][];
 export type Editable = boolean[][];
+export type Candidates = (number[] | null)[][];
 
 export type Difficulty = (typeof DIFFICULTY)[number];
 
@@ -51,6 +52,7 @@ export interface SudokuCellProps {
   col: number;
   row: number;
   editable: Editable;
+  board: Board;
   value: number;
   onUpdate: (
     e: ChangeEvent<HTMLInputElement>,
@@ -66,11 +68,11 @@ export interface SudokuCellProps {
 
 export interface SudokuCellRef {
   activateHint: (row: number, col: number) => void;
-  getActiveHint: () => { row: number; col: number } | null;
+  getActiveHint: () => SudokuHintProps;
   isActiveHint: () => boolean;
 }
 
-export type HintProps = { row: number; col: number };
+export type SudokuHintProps = number[] | null;
 
 export type GameProps = {
   id: string;

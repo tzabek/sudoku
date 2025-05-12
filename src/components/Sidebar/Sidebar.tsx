@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { capitalize } from 'lodash';
+import { AnimatePresence, motion } from 'motion/react';
 import { useSidebar } from '../../lib/hooks';
 import { formatTime } from '../../lib/libs/shared';
+import { SidebarProps } from '../../lib/libs/sidebar';
 
-import 'bootstrap/dist/css/bootstrap.css';
 import './Sidebar.scss';
 
-export default function Sidebar() {
+export default function Sidebar(props: SidebarProps) {
+  const { children } = props;
   const {
     toggles: { toggleSidebar, toggleGameMenu },
     actions: { start, pause, resume, clear },
@@ -59,10 +60,9 @@ export default function Sidebar() {
               </span>
             </div>
             <div className="game-actions">
-              <ButtonGroup>
-                <Button
-                  variant="outline-light"
-                  size="sm"
+              <div className="button-group">
+                <button
+                  type="button"
                   className={isPaused ? 'resume-game' : 'pause-game'}
                   onClick={() => {
                     if (isPaused) {
@@ -78,9 +78,18 @@ export default function Sidebar() {
                     icon={isPaused ? icon.faGamepad : icon.faPause}
                   />
                   <span>{isPaused ? 'Resume' : 'Pause'}</span>
-                </Button>
-              </ButtonGroup>
+                </button>
+              </div>
             </div>
+          </div>
+
+          <div className="sidebar-subheader">
+            <div className="game-hint">
+              <AnimatePresence mode="popLayout">
+                <motion.div id="game-hint" />
+              </AnimatePresence>
+            </div>
+            <div id="game-progress-bar" />
           </div>
 
           <div className="sidebar-menu">
@@ -148,16 +157,10 @@ export default function Sidebar() {
             </ul>
           </div>
         </div>
-        <div className="sidebar-footer">
-          <Link to="/">
-            <Badge pill bg="primary">
-              <FontAwesomeIcon icon={icon.faGamepad} />{' '}
-              {sidebar.games.games.length}
-            </Badge>{' '}
-            games so far
-          </Link>
-        </div>
+        <div className="sidebar-footer">&nbsp;</div>
       </nav>
+
+      <div className="page-content">{children}</div>
     </div>
   );
 }

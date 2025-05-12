@@ -26,7 +26,6 @@ function Sudoku() {
 
   return (
     <form>
-      <section id="board-hint" />
       <section id="board" className="sudoku-board">
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
@@ -39,6 +38,7 @@ function Sudoku() {
                 col={colIdx}
                 row={rowIdx}
                 editable={editableCells}
+                board={board}
                 value={value}
                 onUpdate={(e) => handleInputChange(e, rowIdx, colIdx)}
                 onActivateHint={() =>
