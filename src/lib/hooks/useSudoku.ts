@@ -11,7 +11,7 @@ import {
   loadGames,
   saveGame,
 } from '../libs/game';
-import { removeTimer } from '../libs/timer';
+import { loadTimer, removeTimer } from '../libs/timer';
 
 export function sudokuReducer(
   state: GameProps,
@@ -24,13 +24,22 @@ export function sudokuReducer(
   if (action.type === 'start-game') {
     const now = Date.now();
     const currentGame: GameProps = JSON.parse(JSON.stringify(state));
+    const timer = loadTimer();
 
-    if (currentGame.id) {
+    // Save current game before creating a new one
+    if (currentGame.id && timer && timer.elapsedMs) {
       const updatedGame: GameProps = {
         ...currentGame,
         updatedDate: now,
         status: 'paused',
         timerActive: false,
+        timer: {
+          ...timer,
+          pausedDate: now,
+          startDate: null,
+          elapsedBeforePause: timer.elapsedMs,
+          elapsedMs: timer.elapsedMs,
+        },
       };
       saveGame({ ...state, ...updatedGame });
     }

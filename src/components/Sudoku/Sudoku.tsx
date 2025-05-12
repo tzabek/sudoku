@@ -1,4 +1,6 @@
-import { ChangeEvent, use } from 'react';
+import { ChangeEvent, use, useRef } from 'react';
+import { SudokuCell } from '..';
+import { SudokuCellRef } from '../../lib/libs/game';
 
 import GameContext from '../../lib/context/game-context';
 
@@ -10,6 +12,8 @@ function Sudoku() {
     game: { game: board, editableCells },
     update,
   } = ctx;
+
+  const sudokuCellRef = useRef<SudokuCellRef>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -28,18 +32,19 @@ function Sudoku() {
             const key = crypto.randomUUID();
 
             return (
-              <div className="cell" key={key} data-x={colIdx} data-y={rowIdx}>
-                <input
-                  id={`${rowIdx}-${colIdx}`}
-                  type="text"
-                  maxLength={1}
-                  value={value === 0 ? '' : value}
-                  onChange={(e) => handleInputChange(e, rowIdx, colIdx)}
-                  readOnly={!editableCells[rowIdx][colIdx]}
-                  data-row={rowIdx}
-                  data-col={colIdx}
-                />
-              </div>
+              <SudokuCell
+                key={key}
+                ref={sudokuCellRef}
+                col={colIdx}
+                row={rowIdx}
+                editable={editableCells}
+                board={board}
+                value={value}
+                onUpdate={(e) => handleInputChange(e, rowIdx, colIdx)}
+                onActivateHint={() =>
+                  sudokuCellRef.current?.activateHint(rowIdx, colIdx)
+                }
+              />
             );
           })
         )}
@@ -47,5 +52,7 @@ function Sudoku() {
     </form>
   );
 }
+
+Sudoku.displayName = 'Sudoku';
 
 export default Sudoku;

@@ -1,10 +1,11 @@
+/* eslint-disable import/no-cycle */
 import { GameProps } from '../game';
 
 export type TimerState = {
   id: string;
   startDate: number | null;
   pausedDate: number | null;
-  originalStartDate: number | null;
+  originalStartDate: number;
   elapsedBeforePause: number;
   elapsedMs: number;
 };

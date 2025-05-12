@@ -5,7 +5,7 @@ export const INITIAL_TIMER: TimerState = {
   id: '',
   startDate: null,
   pausedDate: null,
-  originalStartDate: null,
+  originalStartDate: 0,
   elapsedBeforePause: 0,
   elapsedMs: 0,
 };

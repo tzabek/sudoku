@@ -1,8 +1,11 @@
 /* eslint-disable import/no-cycle */
+import { ReactNode } from 'react';
 import { SIDEBAR_MENU } from '.';
 import { SavedGames } from '../game';
 
 export type SidebarMenu = (typeof SIDEBAR_MENU)[number];
+
+export type SidebarProps = { children: ReactNode };
 
 export type SidebarState = {
   id: string;

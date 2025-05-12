@@ -1,8 +1,11 @@
 /* eslint-disable import/no-cycle */
+import { ChangeEvent } from 'react';
 import { DIFFICULTY, GAME_STATUS } from '.';
+import { TimerState } from '../timer';
 
 export type Board = number[][];
 export type Editable = boolean[][];
+export type Candidates = (number[] | null)[][];
 
 export type Difficulty = (typeof DIFFICULTY)[number];
 
@@ -45,6 +48,32 @@ export interface IGameContext {
   resume: (gameState: GameProps) => void;
 }
 
+export interface SudokuCellProps {
+  col: number;
+  row: number;
+  editable: Editable;
+  board: Board;
+  value: number;
+  onUpdate: (
+    e: ChangeEvent<HTMLInputElement>,
+    row: number,
+    col: number
+  ) => void;
+  onActivateHint: (
+    e: React.FocusEvent<HTMLInputElement>,
+    row: number,
+    col: number
+  ) => void;
+}
+
+export interface SudokuCellRef {
+  activateHint: (row: number, col: number) => void;
+  getActiveHint: () => SudokuHintProps;
+  isActiveHint: () => boolean;
+}
+
+export type SudokuHintProps = number[] | null;
+
 export type GameProps = {
   id: string;
   game: Board;
@@ -55,6 +84,7 @@ export type GameProps = {
   completedDate: number;
   status: GameStatus;
   timerActive: boolean;
+  timer: TimerState | null;
 };
 
 export type GameActionProps =

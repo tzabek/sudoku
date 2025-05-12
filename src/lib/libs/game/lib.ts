@@ -43,6 +43,7 @@ export function createGame() {
     completedDate: 0,
     status: 'progress',
     timerActive: true,
+    timer: null,
   };
 
   return newState;

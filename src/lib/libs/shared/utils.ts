@@ -11,7 +11,7 @@ export function formatTime(ms: number) {
 
   const pad = (n: number) => String(n).padStart(2, '0');
 
-  return `${days > 0 ? `${days}d` : ''}${pad(hours)}:${pad(minutes)}:${pad(
+  return `${days > 0 ? `${days}d` : ''} ${pad(hours)}:${pad(minutes)}:${pad(
     seconds
   )}`;
 }
