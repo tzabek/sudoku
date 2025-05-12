@@ -5,17 +5,19 @@ body {
 #root {
   display: flex;
   height: 100vh;
+}
 
-  .page-content {
-    display: flex;
-    padding: 0;
+#root .page-content {
+  width: 100vw;
+  display: flex;
+  padding: 0;
+}
 
-    main {
-      background: #fff;
-      display: inline-flex;
-      flex: auto;
-      justify-content: center;
-      align-items: center;
-    }
-  }
+#root .page-content main {
+  width: 100%;
+  background: #fff;
+  display: inline-flex;
+  flex: auto;
+  justify-content: center;
+  align-items: center;
 }
