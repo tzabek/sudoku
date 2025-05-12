@@ -54,8 +54,10 @@ export default function useSidebar() {
   const [state, dispatch] = useReducer(sidebarReducer, undefined, loadSidebar);
 
   const { game, start, clear, pause, resume } = use(GameContext);
+  const { game: board, editableCells: editable } = game;
 
   const timer = useTimer({ game });
+  const progressProps = { board, editable };
   const isPaused = game.status === 'paused';
 
   // Load sidebar
@@ -82,11 +84,6 @@ export default function useSidebar() {
       toggleGameMenu: () => dispatch({ type: 'toggle-menu' }),
     },
     actions: { start, clear, pause, resume },
-    data: {
-      game,
-      timer,
-      sidebar: state,
-      isPaused,
-    },
+    data: { game, timer, progressProps, sidebar: state, isPaused },
   };
 }

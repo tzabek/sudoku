@@ -11,6 +11,7 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  Typography,
 } from '@mui/material';
 import { green, pink } from '@mui/material/colors';
 import {
@@ -34,12 +35,16 @@ import { ActionButton } from '..';
 import { useSidebar } from '../../lib/hooks';
 import { formatTime } from '../../lib/libs/shared';
 
+import './SidePanel.scss';
+import Progress from './Progress';
+
 export default function SidePanel() {
   const {
     toggles: { toggleSidebar, toggleGameMenu },
     actions: { start, pause, resume, clear },
-    data: { game, timer, sidebar, isPaused },
+    data: { game, timer, progressProps, sidebar, isPaused },
   } = useSidebar();
+  const { board, editable } = progressProps;
 
   return (
     <Sidebar mode="dark" isCollapse={!sidebar.isVisible} showProfile={false}>
@@ -49,10 +54,64 @@ export default function SidePanel() {
         aria-labelledby="nested-list-subheader"
         subheader={
           <ListSubheader component="div" id="nested-list-subheader">
-            Nested List Items
+            <Box className="sidebar-brand">
+              <Link to="/" className="brand-logo">
+                <Extension sx={{ color: pink[500] }} className="logo" />
+                <Typography>Sudoku</Typography>
+              </Link>
+            </Box>
+
+            <Divider aria-hidden="true" component="div" />
+
+            <Box className="sidebar-header">
+              <Box className="game-info">
+                <Box component="span" className="game-status">
+                  <SportsEsports
+                    sx={{ color: isPaused ? pink[500] : green[500] }}
+                  />{' '}
+                  <Box component="span">{capitalize(game.status)}</Box>
+                </Box>
+                <Box className="game-timer">
+                  <AvTimer />{' '}
+                  <Box component="span">{formatTime(timer.elapsedMs)}</Box>
+                </Box>
+              </Box>
+
+              <Box className="game-actions">
+                <ActionButton
+                  aria-label={
+                    isPaused ? 'Game is paused' : 'Game is in progress'
+                  }
+                  size="medium"
+                  variant="contained"
+                  disableElevation
+                  startIcon={isPaused ? <PlayArrow /> : <Pause />}
+                  onClick={() => {
+                    if (isPaused) {
+                      resume(game);
+                      timer.resume();
+                    } else {
+                      pause(game);
+                      timer.pause();
+                    }
+                  }}
+                >
+                  <Box component="span">{isPaused ? 'Resume' : 'Pause'}</Box>
+                </ActionButton>
+              </Box>
+            </Box>
+
+            <Divider aria-hidden="true" component="div" />
+
+            <Box className="sidebar-header">
+              {!!board.length && !!editable.length && (
+                <Progress board={board} editable={editable} />
+              )}
+            </Box>
           </ListSubheader>
         }
       >
+        <Divider aria-hidden="true" component="div" />
         <ListItemButton onClick={toggleGameMenu}>
           <ListItemIcon>
             <Inbox />
