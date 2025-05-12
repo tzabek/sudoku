@@ -5,7 +5,7 @@ import {
   useImperativeHandle,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
+import { Portal } from '@mui/material';
 import {
   SudokuHintProps,
   SudokuCellProps,
@@ -59,8 +59,11 @@ const SudokuCell = forwardRef(function SudokuCell(
         data-col={x}
       />
 
-      {activeHint &&
-        createPortal(<SudokuHint candidates={activeHint} />, portal)}
+      {activeHint && (
+        <Portal container={() => portal}>
+          <SudokuHint candidates={activeHint} />
+        </Portal>
+      )}
     </div>
   );
 });

@@ -1,22 +1,40 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import {
+  Box,
+  Container,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+} from '@mui/material';
 import { useSudoku } from './lib/hooks';
-import { Sidebar, Sudoku } from './components';
+import { SidePanel, Sudoku } from './components';
 
 import GameContext from './lib/context/game-context';
 
 function App() {
   const { contextValue } = useSudoku();
+  const theme = createTheme({
+    palette: {
+      mode: 'dark',
+    },
+  });
 
   return (
-    <GameContext value={contextValue}>
-      <BrowserRouter>
-        <Sidebar>
-          <Routes>
-            <Route path="/" element={<Sudoku />} />
-          </Routes>
-        </Sidebar>
-      </BrowserRouter>
-    </GameContext>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <GameContext value={contextValue}>
+        <BrowserRouter>
+          <Container className="page-content">
+            <SidePanel />
+            <Box component="main">
+              <Routes>
+                <Route path="/" element={<Sudoku />} />
+              </Routes>
+            </Box>
+          </Container>
+        </BrowserRouter>
+      </GameContext>
+    </ThemeProvider>
   );
 }
 
