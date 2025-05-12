@@ -1,0 +1,98 @@
+#nested-list-subheader {
+  display: flex;
+  width: 100%;
+  flex-flow: wrap;
+  padding: 0;
+
+  .MuiDivider-fullWidth {
+    width: 100%;
+  }
+
+  .sidebar-brand {
+    height: 48px;
+
+    > a {
+      display: inline-flex;
+      flex: auto;
+      justify-content: flex-start;
+      align-items: center;
+      text-decoration: none;
+
+      > * {
+        display: inline-flex;
+      }
+
+      > p {
+        margin-left: 10px;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .sidebar-brand,
+  .sidebar-header {
+    display: flex;
+    flex: auto;
+    width: 100%;
+    padding: 8px 16px;
+  }
+
+  .sidebar-header {
+    > .game-info,
+    > .game-actions {
+      display: inline-flex;
+      flex-direction: column;
+      flex: auto;
+      justify-content: center;
+    }
+
+    > .game-info {
+      .game-status,
+      .game-timer {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        font-size: 12px;
+        flex-direction: row;
+        line-height: 32px;
+
+        > span {
+          margin-left: 5px;
+        }
+      }
+    }
+
+    > .game-progress-bar {
+      &,
+      > div {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+      }
+
+      > div {
+        padding: 8px 0;
+
+        > div {
+          display: inline-flex;
+          flex-direction: column;
+          margin: 0;
+
+          > span {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+          }
+
+          > p {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

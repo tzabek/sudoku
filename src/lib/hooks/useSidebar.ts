@@ -1,22 +1,5 @@
 import { use, useEffect, useReducer } from 'react';
 import {
-  FontAwesomeIcon,
-  faBars,
-  faTimes,
-  faPuzzlePiece,
-  faCircle,
-  faChevronDown,
-  faChevronRight,
-  faLightbulb,
-  faBell,
-  faFlagCheckered,
-  faFloppyDisk,
-  faBorderAll,
-  faClipboardQuestion,
-  faClockFour,
-  faHeadset,
-  faPause,
-  faGamepad,
   SidebarState,
   SidebarActionProps,
   saveSidebar,
@@ -71,8 +54,10 @@ export default function useSidebar() {
   const [state, dispatch] = useReducer(sidebarReducer, undefined, loadSidebar);
 
   const { game, start, clear, pause, resume } = use(GameContext);
+  const { game: board, editableCells: editable } = game;
 
   const timer = useTimer({ game });
+  const progressProps = { board, editable };
   const isPaused = game.status === 'paused';
 
   // Load sidebar
@@ -99,30 +84,6 @@ export default function useSidebar() {
       toggleGameMenu: () => dispatch({ type: 'toggle-menu' }),
     },
     actions: { start, clear, pause, resume },
-    data: {
-      game,
-      timer,
-      sidebar: state,
-      isPaused,
-      icons: {
-        FontAwesomeIcon,
-        faBars,
-        faTimes,
-        faPuzzlePiece,
-        faCircle,
-        faChevronDown,
-        faChevronRight,
-        faLightbulb,
-        faBell,
-        faFlagCheckered,
-        faFloppyDisk,
-        faBorderAll,
-        faClipboardQuestion,
-        faClockFour,
-        faHeadset,
-        faPause,
-        faGamepad,
-      },
-    },
+    data: { game, timer, progressProps, sidebar: state, isPaused },
   };
 }
