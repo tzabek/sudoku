@@ -74,6 +74,13 @@ export interface SudokuCellRef {
 
 export type SudokuHintProps = number[] | null;
 
+export type SudokuCellChange = {
+  row: number;
+  col: number;
+  previousValue: number | null;
+  newValue: number | null;
+};
+
 export type GameProps = {
   id: string;
   game: Board;

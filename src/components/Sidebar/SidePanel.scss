@@ -9,8 +9,6 @@
   }
 
   .sidebar-brand {
-    height: 48px;
-
     > a {
       display: inline-flex;
       flex: auto;
@@ -34,10 +32,15 @@
     display: flex;
     flex: auto;
     width: 100%;
-    padding: 8px 16px;
+
+    &:not(.header-progress-bar) {
+      padding: 12px 16px;
+    }
   }
 
   .sidebar-header {
+    position: relative;
+
     > .game-info,
     > .game-actions {
       display: inline-flex;
@@ -71,7 +74,7 @@
       }
 
       > div {
-        padding: 12px 0;
+        padding: 0;
 
         > div {
           display: inline-flex;
