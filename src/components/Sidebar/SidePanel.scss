@@ -33,7 +33,7 @@
     flex: auto;
     width: 100%;
 
-    &:not(.header-progress-bar) {
+    &:not(.header-progress-bar):not(.header-number-tracker) {
       padding: 12px 16px;
     }
   }
