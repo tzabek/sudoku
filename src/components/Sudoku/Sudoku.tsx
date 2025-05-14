@@ -2,7 +2,7 @@ import { ChangeEvent, use, useRef } from 'react';
 import { Box, Divider, IconButton } from '@mui/material';
 import { Undo, Redo } from '@mui/icons-material';
 import { SudokuCell } from '..';
-import { createChangeBatch, SudokuCellRef } from '../../lib/libs/game';
+import { createChangeBatch, ICellRef } from '../../lib/libs/game';
 import { deepCopy } from '../../lib/libs/shared';
 
 import GameContext from '../../lib/context/game-context';
@@ -14,14 +14,16 @@ function Sudoku() {
     game: {
       game: board,
       editableCells,
+      solvedGame: solution,
       history: { undoStack, redoStack },
     },
     apply,
     undo,
     redo,
+    mistake,
   } = use(GameContext);
 
-  const sudokuCellRef = useRef<SudokuCellRef>(null);
+  const sudokuCellRef = useRef<ICellRef>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -39,6 +41,18 @@ function Sudoku() {
 
     newBoard[row][col] = newValue;
 
+    // Log mistake
+    if (newValue !== solution[row][col]) {
+      mistake({
+        row,
+        col,
+        enteredValue: newValue,
+        correctValue: solution[row][col],
+        timestamp: Date.now(),
+      });
+    }
+
+    // Apply changes
     apply(createChangeBatch(board, newBoard));
   };
 

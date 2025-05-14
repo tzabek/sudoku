@@ -1,6 +1,5 @@
 import { useEffect, useReducer } from 'react';
 import {
-  Board,
   createGame,
   GameActionProps,
   GameProps,
@@ -10,7 +9,8 @@ import {
   loadGame,
   loadGames,
   saveGame,
-  SudokuChangeBatch,
+  ChangeBatch,
+  Mistake,
 } from '../libs/game';
 import { loadTimer, removeTimer } from '../libs/timer';
 import { deepCopy } from '../libs/shared';
@@ -20,11 +20,11 @@ export function sudokuReducer(
   action: GameActionProps
 ): GameProps {
   switch (action.type) {
-    case 'create-game': {
+    case 'create': {
       return createGame();
     }
 
-    case 'start-game': {
+    case 'start': {
       const now = Date.now();
       const currentGame: GameProps = JSON.parse(JSON.stringify(state));
       const timer = loadTimer();
@@ -44,6 +44,7 @@ export function sudokuReducer(
             elapsedMs: timer.elapsedMs,
           },
         };
+
         saveGame({ ...state, ...updatedGame });
       }
 
@@ -54,35 +55,13 @@ export function sudokuReducer(
       return newGame;
     }
 
-    case 'load-game': {
+    case 'load': {
       const { payload } = action;
 
       return { ...state, ...payload };
     }
 
-    case 'save-game': {
-      const { game } = action.payload;
-
-      return { ...state, ...game };
-    }
-
-    case 'update-cell': {
-      const { game } = state;
-      const { row, col, val } = action.payload;
-
-      const copy: Board = game.map((r) => [...r]);
-      copy[row][col] = val;
-
-      return {
-        ...state,
-        game: copy,
-        status: 'progress',
-        timerActive: true,
-        updatedDate: Date.now(),
-      };
-    }
-
-    case 'clear-board': {
+    case 'clear': {
       const { game: board, editableCells: editable } = state;
 
       const { changes, clearBoard } = generateClearBoardChanges(
@@ -97,10 +76,11 @@ export function sudokuReducer(
           undoStack: [...state.history.undoStack, { changes }],
           redoStack: [],
         },
+        updatedDate: Date.now(),
       };
     }
 
-    case 'apply-batch': {
+    case 'apply': {
       const { batch } = action.payload;
 
       const newBoard = deepCopy(state.game);
@@ -116,6 +96,7 @@ export function sudokuReducer(
           undoStack: [...state.history.undoStack, batch],
           redoStack: [],
         },
+        updatedDate: Date.now(),
       };
     }
 
@@ -141,6 +122,7 @@ export function sudokuReducer(
           undoStack,
           redoStack: [lastBatch, ...redoStack],
         },
+        updatedDate: Date.now(),
       };
     }
 
@@ -166,34 +148,38 @@ export function sudokuReducer(
           undoStack: [...undoStack, nextBatch],
           redoStack,
         },
+        updatedDate: Date.now(),
       };
     }
 
-    case 'pause-game': {
+    case 'pause': {
       const { game } = action.payload;
-
-      const now = Date.now();
 
       return {
         ...state,
         ...game,
-        updatedDate: now,
+        updatedDate: Date.now(),
         status: 'paused',
         timerActive: false,
       };
     }
 
-    case 'resume-game': {
+    case 'resume': {
       const { game } = action.payload;
-
-      const now = Date.now();
 
       return {
         ...state,
         ...game,
-        updatedDate: now,
+        updatedDate: Date.now(),
         status: 'progress',
         timerActive: true,
+      };
+    }
+
+    case 'mistake': {
+      return {
+        ...state,
+        mistakes: [...state.mistakes, action.payload],
       };
     }
 
@@ -216,12 +202,12 @@ export function useSudoku() {
       const game = loadGame(gameId);
 
       if (game) {
-        dispatch({ type: 'load-game', payload: game });
+        dispatch({ type: 'load', payload: game });
       } else {
-        dispatch({ type: 'start-game' });
+        dispatch({ type: 'start' });
       }
     } else {
-      dispatch({ type: 'create-game' });
+      dispatch({ type: 'create' });
     }
   }, []);
 
@@ -234,17 +220,17 @@ export function useSudoku() {
 
   const contextValue: IGameContext = {
     game: state,
-    create: () => dispatch({ type: 'create-game' }),
-    start: () => dispatch({ type: 'start-game' }),
-    pause: () => dispatch({ type: 'pause-game', payload: { game: state } }),
-    resume: () => dispatch({ type: 'resume-game', payload: { game: state } }),
-    update: (row: number, col: number, val: number) =>
-      dispatch({ type: 'update-cell', payload: { row, col, val } }),
-    apply: (batch: SudokuChangeBatch) =>
-      dispatch({ type: 'apply-batch', payload: { batch } }),
+    create: () => dispatch({ type: 'create' }),
+    start: () => dispatch({ type: 'start' }),
+    pause: () => dispatch({ type: 'pause', payload: { game: state } }),
+    resume: () => dispatch({ type: 'resume', payload: { game: state } }),
+    apply: (batch: ChangeBatch) =>
+      dispatch({ type: 'apply', payload: { batch } }),
     undo: () => dispatch({ type: 'undo' }),
     redo: () => dispatch({ type: 'redo' }),
-    clear: () => dispatch({ type: 'clear-board' }),
+    clear: () => dispatch({ type: 'clear' }),
+    mistake: (mistake: Mistake) =>
+      dispatch({ type: 'mistake', payload: mistake }),
   };
 
   return { contextValue };

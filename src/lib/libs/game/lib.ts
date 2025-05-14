@@ -6,8 +6,8 @@ import {
   Editable,
   GameProps,
   INITIAL_HISTORY_STATE,
-  SudokuCellChange,
-  SudokuChangeBatch,
+  CellChange,
+  ChangeBatch,
 } from '.';
 import { deepCopy } from '../shared';
 
@@ -49,12 +49,13 @@ export function createGame() {
     history: INITIAL_HISTORY_STATE,
     solvedGame,
     editableCells,
+    mistakes: [],
+    timer: null,
     startedDate: now,
     updatedDate: now,
     completedDate: 0,
     status: 'progress',
     timerActive: true,
-    timer: null,
   };
 
   return newState;
@@ -63,8 +64,8 @@ export function createGame() {
 export function createChangeBatch(
   prevBoard: Board,
   newBoard: Board
-): SudokuChangeBatch {
-  const changes: SudokuCellChange[] = [];
+): ChangeBatch {
+  const changes: CellChange[] = [];
 
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
@@ -83,7 +84,7 @@ export function createChangeBatch(
 export function generateClearBoardChanges(board: Board, editable: Editable) {
   const sudoku = createSudoku();
   const clearBoard = sudoku.clear(deepCopy(board), editable).map((r) => [...r]);
-  const changes: SudokuCellChange[] = [];
+  const changes: CellChange[] = [];
 
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
