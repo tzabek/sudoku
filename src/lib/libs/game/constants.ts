@@ -4,10 +4,12 @@ import {
   GameProps,
   IGameContext,
   SavedGames,
-  SudokuHistoryState,
+  HistoryState,
 } from '.';
 
-export const INITIAL_HISTORY_STATE: SudokuHistoryState = {
+export const ALLOWED_INPUT = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => String(i));
+
+export const INITIAL_HISTORY_STATE: HistoryState = {
   undoStack: [],
   redoStack: [],
 };
@@ -18,12 +20,13 @@ export const INITIAL_SUDOKU: GameProps = {
   history: INITIAL_HISTORY_STATE,
   solvedGame: [],
   editableCells: [],
+  mistakes: [],
+  timer: null,
   startedDate: 0,
   updatedDate: 0,
   completedDate: 0,
   status: 'new',
   timerActive: false,
-  timer: null,
 };
 
 export const GAME_STATUS = ['new', 'progress', 'paused', 'completed'] as const;
@@ -38,12 +41,12 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   create: () => {},
   start: () => {},
   clear: () => {},
-  update: () => {},
   apply: () => {},
   undo: () => {},
   redo: () => {},
   pause: () => {},
   resume: () => {},
+  mistake: () => {},
 };
 
 export const DIFFICULTY = [

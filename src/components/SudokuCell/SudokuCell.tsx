@@ -6,11 +6,7 @@ import {
   useState,
 } from 'react';
 import { Tooltip, Zoom } from '@mui/material';
-import {
-  SudokuHintProps,
-  SudokuCellProps,
-  SudokuCellRef,
-} from '../../lib/libs/game';
+import { ALLOWED_INPUT, HintProps, ICell, ICellRef } from '../../lib/libs/game';
 import { useCandidates } from '../../lib/hooks';
 
 function getCandidates(candidates: number[] | null) {
@@ -37,8 +33,8 @@ function getCandidates(candidates: number[] | null) {
 }
 
 const SudokuCell = forwardRef(function SudokuCell(
-  props: SudokuCellProps,
-  ref: ForwardedRef<SudokuCellRef>
+  props: ICell,
+  ref: ForwardedRef<ICellRef>
 ) {
   const {
     row: y,
@@ -50,7 +46,7 @@ const SudokuCell = forwardRef(function SudokuCell(
     onActivateHint,
   } = props;
 
-  const [activeHint, setActiveHint] = useState<SudokuHintProps>(null);
+  const [activeHint, setActiveHint] = useState<HintProps>(null);
 
   const classes = ['cell', ...(!editable[y][x] ? ['prefilled'] : [])];
   const candidates = useCandidates(board, editable);
@@ -83,6 +79,11 @@ const SudokuCell = forwardRef(function SudokuCell(
           onChange={(e) => onUpdate(e, y, x)}
           onFocus={() => setActiveHint(candidates[y][x])}
           onBlur={() => setActiveHint(null)}
+          onKeyDown={(e) => {
+            if (!ALLOWED_INPUT.includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
           readOnly={!editable[y][x]}
           data-row={y}
           data-col={x}

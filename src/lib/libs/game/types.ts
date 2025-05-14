@@ -43,15 +43,15 @@ export interface IGameContext {
   create: (gameState: GameProps) => void;
   start: () => void;
   clear: (gameState: GameProps) => void;
-  update: (row: number, col: number, val: number) => void;
-  apply: (batch: SudokuChangeBatch) => void;
+  apply: (batch: ChangeBatch) => void;
   undo: () => void;
   redo: () => void;
   pause: (gameState: GameProps) => void;
   resume: (gameState: GameProps) => void;
+  mistake: (mistake: Mistake) => void;
 }
 
-export interface SudokuCellProps {
+export interface ICell {
   col: number;
   row: number;
   editable: Editable;
@@ -69,68 +69,71 @@ export interface SudokuCellProps {
   ) => void;
 }
 
-export interface SudokuCellRef {
+export interface ICellRef {
   activateHint: (row: number, col: number) => void;
-  getActiveHint: () => SudokuHintProps;
+  getActiveHint: () => HintProps;
   isActiveHint: () => boolean;
 }
 
-export type SudokuHintProps = number[] | null;
+export type HintProps = number[] | null;
 
-export type SudokuCellChange = {
+export type CellChange = {
   row: number;
   col: number;
   previousValue: number;
   newValue: number;
 };
 
-export type SudokuChangeBatch = {
-  changes: SudokuCellChange[];
+export type ChangeBatch = {
+  changes: CellChange[];
 };
 
-export type SudokuHistoryState = {
-  undoStack: SudokuChangeBatch[];
-  redoStack: SudokuChangeBatch[];
+export type HistoryState = {
+  undoStack: ChangeBatch[];
+  redoStack: ChangeBatch[];
 };
 
 export type GameProps = {
   id: string;
   game: Board;
-  history: SudokuHistoryState;
+  history: HistoryState;
   solvedGame: Board;
   editableCells: Editable;
+  mistakes: Mistake[];
+  timer: TimerState | null;
   startedDate: number;
   updatedDate: number;
   completedDate: number;
   status: GameStatus;
   timerActive: boolean;
-  timer: TimerState | null;
 };
 
 export type GameActionProps =
-  | { type: 'create-game' }
-  | { type: 'start-game' }
-  | { type: 'update-cell'; payload: { row: number; col: number; val: number } }
-  | { type: 'apply-batch'; payload: { batch: SudokuChangeBatch } }
+  | { type: 'create' }
+  | { type: 'start' }
+  | { type: 'apply'; payload: { batch: ChangeBatch } }
   | { type: 'undo' }
   | { type: 'redo' }
-  | { type: 'clear-board' }
-  | { type: 'load-game'; payload: GameProps }
-  | { type: 'save-game'; payload: { game: GameProps } }
-  | { type: 'pause-game'; payload: { game: GameProps } }
-  | { type: 'resume-game'; payload: { game: GameProps } };
+  | { type: 'clear' }
+  | { type: 'mistake'; payload: Mistake }
+  | { type: 'load'; payload: GameProps }
+  | { type: 'pause'; payload: { game: GameProps } }
+  | { type: 'resume'; payload: { game: GameProps } };
 
 export type SavedGames = {
   activeId: string;
   games: GameProps[];
 };
 
-export type SolutionModalProps = {
-  game: Board;
-  solvedGame: Board;
-};
-
 export type SelectedCellProps = {
   row: number;
   col: number;
+};
+
+export type Mistake = {
+  row: number;
+  col: number;
+  enteredValue: number;
+  correctValue: number;
+  timestamp: number;
 };
