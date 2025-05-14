@@ -5,6 +5,7 @@ import {
   IGameContext,
   SavedGames,
   HistoryState,
+  NumberTracker,
 } from '.';
 
 export const ALLOWED_INPUT = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => String(i));
@@ -47,6 +48,18 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   pause: () => {},
   resume: () => {},
   mistake: () => {},
+};
+
+export const INITIAL_NUMBER_TRACKER: NumberTracker = {
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0,
+  6: 0,
+  7: 0,
+  8: 0,
+  9: 0,
 };
 
 export const DIFFICULTY = [

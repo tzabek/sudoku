@@ -24,7 +24,7 @@ import {
   BorderAll,
   CloudSync,
 } from '@mui/icons-material';
-import { ActionButton, Progress } from '..';
+import { ActionButton, NumberTracker, Progress } from '..';
 import { useSidebar } from '../../lib/hooks';
 import { formatTime } from '../../lib/libs/shared';
 
@@ -46,6 +46,7 @@ export default function SidePanel() {
         aria-labelledby="nested-list-subheader"
         subheader={
           <ListSubheader component="div" id="nested-list-subheader">
+            {/* Game branding */}
             <Box className="sidebar-brand">
               <Link to="/" className="brand-logo">
                 <Extension sx={{ color: pink[500] }} className="logo" />
@@ -62,6 +63,7 @@ export default function SidePanel() {
             <Divider aria-hidden="true" component="div" />
 
             <Box className="sidebar-header">
+              {/* Game timer */}
               <Box className="game-info">
                 <Box className="game-timer">
                   <AvTimer sx={{ color: isPaused ? pink[500] : green[500] }} />{' '}
@@ -75,6 +77,7 @@ export default function SidePanel() {
                 </Box>
               </Box>
 
+              {/* Game actions */}
               <Box className="game-actions">
                 <ActionButton
                   aria-label={
@@ -101,10 +104,18 @@ export default function SidePanel() {
 
             <Divider aria-hidden="true" component="div" />
 
+            {/* Progress bar */}
             <Box className="sidebar-header header-progress-bar">
               {!!board.length && !!editable.length && (
                 <Progress board={board} editable={editable} />
               )}
+            </Box>
+
+            <Divider aria-hidden="true" component="div" />
+
+            {/* Number tracker */}
+            <Box className="sidebar-header header-number-tracker">
+              {!!board.length && <NumberTracker board={board} />}
             </Box>
           </ListSubheader>
         }
