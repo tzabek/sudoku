@@ -1,9 +1,21 @@
 /* eslint-disable import/no-cycle */
-import { Difficulty, GameProps, IGameContext, SavedGames } from '.';
+import {
+  Difficulty,
+  GameProps,
+  IGameContext,
+  SavedGames,
+  SudokuHistoryState,
+} from '.';
+
+export const INITIAL_HISTORY_STATE: SudokuHistoryState = {
+  undoStack: [],
+  redoStack: [],
+};
 
 export const INITIAL_SUDOKU: GameProps = {
   id: '',
   game: [],
+  history: INITIAL_HISTORY_STATE,
   solvedGame: [],
   editableCells: [],
   startedDate: 0,
@@ -27,6 +39,9 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   start: () => {},
   clear: () => {},
   update: () => {},
+  apply: () => {},
+  undo: () => {},
+  redo: () => {},
   pause: () => {},
   resume: () => {},
 };

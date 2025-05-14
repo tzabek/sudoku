@@ -1,5 +1,15 @@
 /* eslint-disable import/no-cycle */
-import { createGameStorage, createSudoku, GameProps } from '.';
+import {
+  Board,
+  createGameStorage,
+  createSudoku,
+  Editable,
+  GameProps,
+  INITIAL_HISTORY_STATE,
+  SudokuCellChange,
+  SudokuChangeBatch,
+} from '.';
+import { deepCopy } from '../shared';
 
 export function loadGames() {
   const storage = createGameStorage();
@@ -36,6 +46,7 @@ export function createGame() {
   const newState: GameProps = {
     id,
     game,
+    history: INITIAL_HISTORY_STATE,
     solvedGame,
     editableCells,
     startedDate: now,
@@ -47,4 +58,45 @@ export function createGame() {
   };
 
   return newState;
+}
+
+export function createChangeBatch(
+  prevBoard: Board,
+  newBoard: Board
+): SudokuChangeBatch {
+  const changes: SudokuCellChange[] = [];
+
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      const previousValue = prevBoard[row][col];
+      const newValue = newBoard[row][col];
+
+      if (previousValue !== newValue) {
+        changes.push({ row, col, previousValue, newValue });
+      }
+    }
+  }
+
+  return { changes };
+}
+
+export function generateClearBoardChanges(board: Board, editable: Editable) {
+  const sudoku = createSudoku();
+  const clearBoard = sudoku.clear(deepCopy(board), editable).map((r) => [...r]);
+  const changes: SudokuCellChange[] = [];
+
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      if (clearBoard[row][col] === 0 && board[row][col] !== 0) {
+        changes.push({
+          row,
+          col,
+          previousValue: board[row][col],
+          newValue: 0,
+        });
+      }
+    }
+  }
+
+  return { changes, clearBoard };
 }

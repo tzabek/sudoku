@@ -9,6 +9,7 @@ body {
 
 #root .page-content {
   width: 100vw;
+  max-width: 100vw;
   display: flex;
   padding: 0;
 }

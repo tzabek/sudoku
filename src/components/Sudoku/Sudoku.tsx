@@ -2,8 +2,8 @@ import { ChangeEvent, use, useRef } from 'react';
 import { Box, Divider, IconButton } from '@mui/material';
 import { Undo, Redo } from '@mui/icons-material';
 import { SudokuCell } from '..';
-import { SudokuCellRef } from '../../lib/libs/game';
-import { useUndoRedo } from '../../lib/hooks';
+import { createChangeBatch, SudokuCellRef } from '../../lib/libs/game';
+import { deepCopy } from '../../lib/libs/shared';
 
 import GameContext from '../../lib/context/game-context';
 
@@ -11,14 +11,16 @@ import './Sudoku.scss';
 
 function Sudoku() {
   const {
-    game: { game: board, editableCells },
-    update,
+    game: {
+      game: board,
+      editableCells,
+      history: { undoStack, redoStack },
+    },
+    apply,
+    undo,
+    redo,
   } = use(GameContext);
-  const { addChange, undo, redo, canUndo, canRedo, history, future } =
-    useUndoRedo();
 
-  const recentUndo = history[history.length - 1];
-  const recentRedo = future[0];
   const sudokuCellRef = useRef<SudokuCellRef>(null);
 
   const handleInputChange = (
@@ -26,6 +28,7 @@ function Sudoku() {
     row: number,
     col: number
   ) => {
+    const newBoard = deepCopy(board);
     const previousValue = board[row][col];
     const input = Number(e.target.value);
     const newValue = Number.isNaN(input) ? 0 : input;
@@ -34,12 +37,13 @@ function Sudoku() {
       return;
     }
 
-    addChange({ row, col, previousValue, newValue });
-    update(row, col, newValue);
+    newBoard[row][col] = newValue;
+
+    apply(createChangeBatch(board, newBoard));
   };
 
   return (
-    <Box component="form">
+    <Box component="form" autoComplete="off">
       <Box component="section" id="game-toolbar" className="sudoku-toolbar">
         <Box
           sx={{
@@ -55,17 +59,9 @@ function Sudoku() {
           <IconButton
             aria-label="Undo"
             size="small"
-            disabled={!canUndo}
+            disabled={!undoStack.length}
             sx={{ borderRadius: 0 }}
-            onClick={() =>
-              undo(() =>
-                update(
-                  recentUndo.row,
-                  recentUndo.col,
-                  recentUndo.previousValue || 0
-                )
-              )
-            }
+            onClick={() => undo()}
           >
             <Undo />
           </IconButton>
@@ -73,13 +69,9 @@ function Sudoku() {
           <IconButton
             aria-label="Redo"
             size="small"
-            disabled={!canRedo}
+            disabled={!redoStack.length}
             sx={{ borderRadius: 0 }}
-            onClick={() =>
-              redo(() =>
-                update(recentRedo.row, recentRedo.col, recentRedo.newValue || 0)
-              )
-            }
+            onClick={() => redo()}
           >
             <Redo />
           </IconButton>
