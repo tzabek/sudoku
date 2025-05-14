@@ -75,6 +75,7 @@ const SudokuCell = forwardRef(function SudokuCell(
     >
       <div className={classes.join(' ')} data-x={x} data-y={y}>
         <input
+          autoComplete="off"
           id={`${y}-${x}`}
           type="text"
           maxLength={1}

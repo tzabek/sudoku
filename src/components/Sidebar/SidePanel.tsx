@@ -19,8 +19,10 @@ import {
   AvTimer,
   ExpandMore,
   ExpandLess,
-  StarBorder,
-  Inbox,
+  DashboardCustomize,
+  SportsEsports,
+  BorderAll,
+  CloudSync,
 } from '@mui/icons-material';
 import { ActionButton, Progress } from '..';
 import { useSidebar } from '../../lib/hooks';
@@ -30,14 +32,14 @@ import './SidePanel.scss';
 
 export default function SidePanel() {
   const {
-    toggles: { toggleGameMenu },
     actions: { start, pause, resume, clear },
-    data: { game, timer, progressProps, sidebar, isPaused },
+    data: { game, timer, progressProps, isPaused },
+    menu: { showGameMenu, setShowGameMenu },
   } = useSidebar();
   const { board, editable } = progressProps;
 
   return (
-    <Sidebar mode="dark" isCollapse={!sidebar.isVisible} showProfile={false}>
+    <Sidebar mode="dark" showProfile={false}>
       <List
         sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
         component="nav"
@@ -99,7 +101,7 @@ export default function SidePanel() {
 
             <Divider aria-hidden="true" component="div" />
 
-            <Box className="sidebar-header">
+            <Box className="sidebar-header header-progress-bar">
               {!!board.length && !!editable.length && (
                 <Progress board={board} editable={editable} />
               )}
@@ -108,14 +110,14 @@ export default function SidePanel() {
         }
       >
         <Divider aria-hidden="true" component="div" />
-        <ListItemButton onClick={toggleGameMenu}>
+        <ListItemButton onClick={() => setShowGameMenu(!showGameMenu)}>
           <ListItemIcon>
-            <Inbox />
+            <SportsEsports />
           </ListItemIcon>
           <ListItemText primary="Game menu" />
-          {sidebar.menu.game.isActive ? <ExpandLess /> : <ExpandMore />}
+          {showGameMenu ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-        <Collapse in={sidebar.menu.game.isActive} timeout="auto" unmountOnExit>
+        <Collapse in={showGameMenu} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             <ListItemButton
               sx={{ pl: 4 }}
@@ -125,14 +127,21 @@ export default function SidePanel() {
               }}
             >
               <ListItemIcon>
-                <StarBorder />
+                <DashboardCustomize />
               </ListItemIcon>
-              <ListItemText primary="Start new game" />
+              <ListItemText primary="Start game" />
+            </ListItemButton>
+
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <CloudSync />
+              </ListItemIcon>
+              <ListItemText primary="Load game" />
             </ListItemButton>
 
             <ListItemButton sx={{ pl: 4 }} onClick={() => clear(game)}>
               <ListItemIcon>
-                <StarBorder />
+                <BorderAll />
               </ListItemIcon>
               <ListItemText primary="Clear board" />
             </ListItemButton>

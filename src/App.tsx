@@ -13,11 +13,8 @@ import GameContext from './lib/context/game-context';
 
 function App() {
   const { contextValue } = useSudoku();
-  const theme = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  });
+
+  const theme = createTheme({ palette: { mode: 'dark' } });
 
   return (
     <ThemeProvider theme={theme}>

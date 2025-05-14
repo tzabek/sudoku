@@ -1,17 +1,25 @@
 import { ChangeEvent, use, useRef } from 'react';
+import { Box, Divider, IconButton } from '@mui/material';
+import { Undo, Redo } from '@mui/icons-material';
 import { SudokuCell } from '..';
-import { SudokuCellRef } from '../../lib/libs/game';
+import { createChangeBatch, SudokuCellRef } from '../../lib/libs/game';
+import { deepCopy } from '../../lib/libs/shared';
 
 import GameContext from '../../lib/context/game-context';
 
 import './Sudoku.scss';
 
 function Sudoku() {
-  const ctx = use(GameContext);
   const {
-    game: { game: board, editableCells },
-    update,
-  } = ctx;
+    game: {
+      game: board,
+      editableCells,
+      history: { undoStack, redoStack },
+    },
+    apply,
+    undo,
+    redo,
+  } = use(GameContext);
 
   const sudokuCellRef = useRef<SudokuCellRef>(null);
 
@@ -20,13 +28,56 @@ function Sudoku() {
     row: number,
     col: number
   ) => {
-    const num = Number(e.target.value);
-    update(row, col, Number.isNaN(num) ? 0 : num);
+    const newBoard = deepCopy(board);
+    const previousValue = board[row][col];
+    const input = Number(e.target.value);
+    const newValue = Number.isNaN(input) ? 0 : input;
+
+    if (previousValue === newValue) {
+      return;
+    }
+
+    newBoard[row][col] = newValue;
+
+    apply(createChangeBatch(board, newBoard));
   };
 
   return (
-    <form>
-      <section id="board" className="sudoku-board">
+    <Box component="form" autoComplete="off">
+      <Box component="section" id="game-toolbar" className="sudoku-toolbar">
+        <Box
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            color: 'text.secondary',
+          }}
+        >
+          <IconButton
+            aria-label="Undo"
+            size="small"
+            disabled={!undoStack.length}
+            sx={{ borderRadius: 0 }}
+            onClick={() => undo()}
+          >
+            <Undo />
+          </IconButton>
+          <Divider orientation="vertical" variant="middle" flexItem />
+          <IconButton
+            aria-label="Redo"
+            size="small"
+            disabled={!redoStack.length}
+            sx={{ borderRadius: 0 }}
+            onClick={() => redo()}
+          >
+            <Redo />
+          </IconButton>
+        </Box>
+      </Box>
+      <Box component="section" id="board" className="sudoku-board">
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
             const key = crypto.randomUUID();
@@ -48,8 +99,8 @@ function Sudoku() {
             );
           })
         )}
-      </section>
-    </form>
+      </Box>
+    </Box>
   );
 }
 

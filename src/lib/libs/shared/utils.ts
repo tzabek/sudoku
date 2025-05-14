@@ -1,5 +1,5 @@
-export function foo(bar: unknown) {
-  return bar;
+export function deepCopy<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 export function formatTime(ms: number) {

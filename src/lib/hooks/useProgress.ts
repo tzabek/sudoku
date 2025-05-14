@@ -18,6 +18,6 @@ export default function useProgress(board: Board, editable: Editable) {
       }
     }
 
-    return total === 0 ? 0 : (filled / total) * 100;
+    return total === 0 ? 0 : Math.round((filled / total) * 100);
   }, [board, editable]);
 }

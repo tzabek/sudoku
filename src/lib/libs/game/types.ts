@@ -44,6 +44,9 @@ export interface IGameContext {
   start: () => void;
   clear: (gameState: GameProps) => void;
   update: (row: number, col: number, val: number) => void;
+  apply: (batch: SudokuChangeBatch) => void;
+  undo: () => void;
+  redo: () => void;
   pause: (gameState: GameProps) => void;
   resume: (gameState: GameProps) => void;
 }
@@ -74,9 +77,26 @@ export interface SudokuCellRef {
 
 export type SudokuHintProps = number[] | null;
 
+export type SudokuCellChange = {
+  row: number;
+  col: number;
+  previousValue: number;
+  newValue: number;
+};
+
+export type SudokuChangeBatch = {
+  changes: SudokuCellChange[];
+};
+
+export type SudokuHistoryState = {
+  undoStack: SudokuChangeBatch[];
+  redoStack: SudokuChangeBatch[];
+};
+
 export type GameProps = {
   id: string;
   game: Board;
+  history: SudokuHistoryState;
   solvedGame: Board;
   editableCells: Editable;
   startedDate: number;
@@ -91,9 +111,12 @@ export type GameActionProps =
   | { type: 'create-game' }
   | { type: 'start-game' }
   | { type: 'update-cell'; payload: { row: number; col: number; val: number } }
+  | { type: 'apply-batch'; payload: { batch: SudokuChangeBatch } }
+  | { type: 'undo' }
+  | { type: 'redo' }
+  | { type: 'clear-board' }
   | { type: 'load-game'; payload: GameProps }
   | { type: 'save-game'; payload: { game: GameProps } }
-  | { type: 'clear-board'; payload: { game: GameProps } }
   | { type: 'pause-game'; payload: { game: GameProps } }
   | { type: 'resume-game'; payload: { game: GameProps } };
 
