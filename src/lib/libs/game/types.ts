@@ -137,3 +137,6 @@ export type Mistake = {
   correctValue: number;
   timestamp: number;
 };
+
+export type NumberTracker = Record<number, number>;
+export type NumberTrackerProps = { board: Board };

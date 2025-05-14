@@ -1,17 +1,17 @@
 import { useCallback, useState } from 'react';
-import { SudokuCellChange } from '../libs/game';
+import { CellChange } from '../libs/game';
 
 export default function useUndoRedo() {
-  const [history, setHistory] = useState<SudokuCellChange[]>([]);
-  const [future, setFuture] = useState<SudokuCellChange[]>([]);
+  const [history, setHistory] = useState<CellChange[]>([]);
+  const [future, setFuture] = useState<CellChange[]>([]);
 
-  const addChange = useCallback(function addChange(change: SudokuCellChange) {
+  const addChange = useCallback(function addChange(change: CellChange) {
     setHistory((prev) => [...prev, change]);
     setFuture([]);
   }, []);
 
   const undo = useCallback(
-    (applyChange: (change: SudokuCellChange) => void) => {
+    (applyChange: (change: CellChange) => void) => {
       if (history.length === 0) {
         return;
       }
@@ -27,7 +27,7 @@ export default function useUndoRedo() {
   );
 
   const redo = useCallback(
-    (applyChange: (change: SudokuCellChange) => void) => {
+    (applyChange: (change: CellChange) => void) => {
       if (future.length === 0) {
         return;
       }

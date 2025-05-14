@@ -1,0 +1,23 @@
+.number-tracker {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+
+  .number-count {
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-align: center;
+
+    .number {
+      font-weight: bold;
+      display: block;
+    }
+
+    .count {
+      font-size: 0.9em;
+      color: #555;
+    }
+  }
+}
