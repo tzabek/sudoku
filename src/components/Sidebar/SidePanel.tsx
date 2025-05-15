@@ -30,13 +30,14 @@ import { formatTime } from '../../lib/libs/shared';
 
 import './SidePanel.scss';
 
-export default function SidePanel() {
+function SidePanel() {
   const {
     actions: { start, pause, resume, clear },
     data: { game, timer, progressProps, isPaused },
     menu: { showGameMenu, setShowGameMenu },
   } = useSidebar();
   const { board, editable } = progressProps;
+  const { status } = game;
 
   return (
     <Sidebar mode="dark" showProfile={false}>
@@ -77,29 +78,31 @@ export default function SidePanel() {
                 </Box>
               </Box>
 
-              {/* Game actions */}
-              <Box className="game-actions">
-                <ActionButton
-                  aria-label={
-                    isPaused ? 'Game is paused' : 'Game is in progress'
-                  }
-                  size="medium"
-                  variant="contained"
-                  disableElevation
-                  startIcon={isPaused ? <PlayArrow /> : <Pause />}
-                  onClick={() => {
-                    if (isPaused) {
-                      resume(game);
-                      timer.resume();
-                    } else {
-                      pause(game);
-                      timer.pause();
+              {/* Game/Timer actions */}
+              {status !== 'completed' && (
+                <Box className="game-actions">
+                  <ActionButton
+                    aria-label={
+                      isPaused ? 'Game is paused' : 'Game is in progress'
                     }
-                  }}
-                >
-                  {isPaused ? 'Resume' : 'Pause'}
-                </ActionButton>
-              </Box>
+                    size="medium"
+                    variant="contained"
+                    disableElevation
+                    startIcon={isPaused ? <PlayArrow /> : <Pause />}
+                    onClick={() => {
+                      if (isPaused) {
+                        resume(game);
+                        timer.resume();
+                      } else {
+                        pause(game);
+                        timer.pause();
+                      }
+                    }}
+                  >
+                    {isPaused ? 'Resume' : 'Pause'}
+                  </ActionButton>
+                </Box>
+              )}
             </Box>
 
             <Divider aria-hidden="true" component="div" />
@@ -162,3 +165,7 @@ export default function SidePanel() {
     </Sidebar>
   );
 }
+
+SidePanel.displayName = 'SidePanel';
+
+export default SidePanel;

@@ -53,15 +53,30 @@ $grid-size: 9;
 
     &:hover {
       background: rgb(214, 233, 240);
-    }
-
-    &.prefilled {
-      background: #f0f0f0;
 
       > input {
         font-weight: bold;
         color: #222;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease, color 0.3s ease;
+      }
+    }
+
+    &.prefilled {
+      background: #f0f0f0;
+    }
+
+    &.solved {
+      background: #c8e6c9;
+    }
+
+    &.prefilled,
+    &.solved {
+      > input {
+        font-weight: bold;
+        color: #222;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease, color 0.3s ease;
       }
     }
   }
@@ -76,6 +91,13 @@ $grid-size: 9;
       .cell[data-y='#{$y}'] {
         background: rgb(214, 233, 240);
         transition: background 0.3s ease, color 0.3s ease;
+
+        > input {
+          font-weight: bold;
+          color: #222;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+          transition: all 0.3s ease, color 0.3s ease;
+        }
       }
     }
   }

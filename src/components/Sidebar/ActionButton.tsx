@@ -15,4 +15,6 @@ const ActionButton = styled(Button)<ButtonProps>(({ theme }) => ({
   fontSize: '11px',
 }));
 
+ActionButton.displayName = 'ActionButton';
+
 export default ActionButton;

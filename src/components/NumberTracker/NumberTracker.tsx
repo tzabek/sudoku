@@ -23,7 +23,7 @@ function Title({ number, count }: { number: number; count: number }) {
   );
 }
 
-export default function NumberTracker(props: NumberTrackerProps) {
+function NumberTracker(props: NumberTrackerProps) {
   const { board } = props;
 
   const numberStats = useMemo(() => {
@@ -113,3 +113,7 @@ export default function NumberTracker(props: NumberTrackerProps) {
     </Box>
   );
 }
+
+NumberTracker.displayName = 'NumberTracker';
+
+export default NumberTracker;

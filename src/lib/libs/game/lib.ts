@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable import/no-cycle */
 import {
   Board,
@@ -54,6 +55,7 @@ export function createGame() {
     startedDate: now,
     updatedDate: now,
     completedDate: 0,
+    gameWon: false,
     status: 'progress',
     timerActive: true,
   };
@@ -100,4 +102,62 @@ export function generateClearBoardChanges(board: Board, editable: Editable) {
   }
 
   return { changes, clearBoard };
+}
+
+export function isBoardFull(board: Board) {
+  return board.every((row) => row.every((cell) => cell !== 0));
+}
+
+function isValidGroup(group: number[]) {
+  const seen = new Set<number>();
+
+  for (const val of group) {
+    const num = Number(val);
+
+    if (num === 0 || seen.has(num)) {
+      return false;
+    }
+
+    seen.add(num);
+  }
+
+  return true;
+}
+
+export function isBoardSolved(board: Board) {
+  const getBox = (boxIndex: number) => {
+    const box: number[] = [];
+    const startRow = Math.floor(boxIndex / 3) * 3;
+    const startCol = (boxIndex % 3) * 3;
+
+    for (let r = 0; r < 3; r += 1) {
+      for (let c = 0; c < 3; c += 1) {
+        box.push(board[startRow + r][startCol + c]);
+      }
+    }
+
+    return box;
+  };
+
+  for (let i = 0; i < 9; i += 1) {
+    const row = board[i];
+    const col = board.map((r) => r[i]);
+    const box = getBox(i);
+
+    if (!isValidGroup(row) || !isValidGroup(col) || !isValidGroup(box)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function calculateScore(elapsed: number, mistakes: number) {
+  const baseScore = 1000;
+  const seconds = Math.floor(elapsed / baseScore);
+  const timePenalty = seconds * 2; // 2 points off per second
+  const mistakePenalty = mistakes * 100; // 100 points off per mistake
+  const score = baseScore - timePenalty - mistakePenalty;
+
+  return Math.max(score, 0);
 }

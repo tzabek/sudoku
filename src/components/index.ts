@@ -6,3 +6,4 @@ export { default as SidePanel } from './Sidebar/SidePanel';
 export { default as ActionButton } from './Sidebar/ActionButton';
 export { default as Progress } from './Sidebar/Progress';
 export { default as NumberTracker } from './NumberTracker/NumberTracker';
+export { default as VictoryModal } from './VictoryModal/VictoryModal';

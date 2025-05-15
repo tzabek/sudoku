@@ -42,13 +42,19 @@ const SudokuCell = forwardRef(function SudokuCell(
     editable,
     board,
     value,
+    status,
     onUpdate,
     onActivateHint,
   } = props;
 
   const [activeHint, setActiveHint] = useState<HintProps>(null);
 
-  const classes = ['cell', ...(!editable[y][x] ? ['prefilled'] : [])];
+  const classes = [
+    'cell',
+    ...(!editable[y][x]
+      ? ['prefilled']
+      : [...(status === 'completed' ? ['solved'] : [])]),
+  ];
   const candidates = useCandidates(board, editable);
 
   useImperativeHandle(ref, () => ({
@@ -84,7 +90,7 @@ const SudokuCell = forwardRef(function SudokuCell(
               e.preventDefault();
             }
           }}
-          readOnly={!editable[y][x]}
+          readOnly={!editable[y][x] || status === 'completed'}
           data-row={y}
           data-col={x}
         />
