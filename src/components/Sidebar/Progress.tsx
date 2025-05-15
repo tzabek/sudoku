@@ -26,7 +26,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-export default function Progress(props: ProgressProps) {
+function Progress(props: ProgressProps) {
   const { board, editable } = props;
 
   const progress = useProgress(board, editable);
@@ -51,3 +51,7 @@ export default function Progress(props: ProgressProps) {
     </Box>
   );
 }
+
+Progress.displayName = 'Progress';
+
+export default Progress;

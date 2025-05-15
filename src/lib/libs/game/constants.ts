@@ -5,10 +5,21 @@ import {
   IGameContext,
   SavedGames,
   HistoryState,
-  NumberTracker,
 } from '.';
 
-export const ALLOWED_INPUT = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => String(i));
+const NON_NUMERIC_INPUT = [
+  'Backspace',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'Tab',
+];
+
+export const ALLOWED_INPUT = [
+  ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => String(i)),
+  ...NON_NUMERIC_INPUT,
+];
 
 export const INITIAL_HISTORY_STATE: HistoryState = {
   undoStack: [],
@@ -26,11 +37,18 @@ export const INITIAL_SUDOKU: GameProps = {
   startedDate: 0,
   updatedDate: 0,
   completedDate: 0,
+  gameWon: false,
   status: 'new',
   timerActive: false,
 };
 
-export const GAME_STATUS = ['new', 'progress', 'paused', 'completed'] as const;
+export const GAME_STATUS = [
+  'new',
+  'progress',
+  'paused',
+  'incorrect',
+  'completed',
+] as const;
 
 export const INITIAL_SAVED_GAMES: SavedGames = {
   activeId: '',
@@ -48,18 +66,6 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   pause: () => {},
   resume: () => {},
   mistake: () => {},
-};
-
-export const INITIAL_NUMBER_TRACKER: NumberTracker = {
-  1: 0,
-  2: 0,
-  3: 0,
-  4: 0,
-  5: 0,
-  6: 0,
-  7: 0,
-  8: 0,
-  9: 0,
 };
 
 export const DIFFICULTY = [

@@ -11,8 +11,10 @@ import {
   saveGame,
   ChangeBatch,
   Mistake,
+  isBoardFull,
+  isBoardSolved,
 } from '../libs/game';
-import { loadTimer, removeTimer } from '../libs/timer';
+import { loadTimer, removeTimer, TimerState } from '../libs/timer';
 import { deepCopy } from '../libs/shared';
 
 export function sudokuReducer(
@@ -69,6 +71,11 @@ export function sudokuReducer(
         editable
       );
 
+      // Return current state if no changes were applied
+      if (JSON.stringify(clearBoard) === JSON.stringify(board)) {
+        return state;
+      }
+
       return {
         ...state,
         game: clearBoard,
@@ -82,12 +89,41 @@ export function sudokuReducer(
 
     case 'apply': {
       const { batch } = action.payload;
+      const { changes } = batch;
+      const { status, game } = state;
 
-      const newBoard = deepCopy(state.game);
+      const now = Date.now();
+      const newBoard = deepCopy(game);
 
-      batch.changes.forEach(({ row, col, newValue }) => {
+      changes.forEach(({ row, col, newValue }) => {
         newBoard[row][col] = newValue;
       });
+
+      const isFull = isBoardFull(newBoard);
+      const isSolved = isFull && isBoardSolved(newBoard);
+
+      let gameStatus = status;
+      let timerActive = true;
+      let currentTimer: TimerState | null = loadTimer();
+
+      if (isFull && !isSolved) {
+        gameStatus = 'incorrect';
+      } else if (isSolved) {
+        gameStatus = 'completed';
+        timerActive = false;
+
+        if (currentTimer) {
+          currentTimer = {
+            ...currentTimer,
+            pausedDate: currentTimer.pausedDate || now,
+            startDate: null,
+            elapsedBeforePause: currentTimer.elapsedMs,
+            elapsedMs: currentTimer.elapsedMs,
+          };
+        }
+      } else {
+        gameStatus = 'progress';
+      }
 
       return {
         ...state,
@@ -96,7 +132,12 @@ export function sudokuReducer(
           undoStack: [...state.history.undoStack, batch],
           redoStack: [],
         },
-        updatedDate: Date.now(),
+        updatedDate: now,
+        gameWon: isSolved,
+        completedDate: isSolved ? now : 0,
+        status: gameStatus,
+        timerActive,
+        timer: currentTimer,
       };
     }
 

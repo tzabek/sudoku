@@ -1,7 +1,7 @@
 import { ChangeEvent, use, useRef } from 'react';
 import { Box, Divider, IconButton } from '@mui/material';
 import { Undo, Redo } from '@mui/icons-material';
-import { SudokuCell } from '..';
+import { SudokuCell, VictoryModal } from '..';
 import { createChangeBatch, ICellRef } from '../../lib/libs/game';
 import { deepCopy } from '../../lib/libs/shared';
 
@@ -16,6 +16,7 @@ function Sudoku() {
       editableCells,
       solvedGame: solution,
       history: { undoStack, redoStack },
+      status,
     },
     apply,
     undo,
@@ -58,6 +59,7 @@ function Sudoku() {
 
   return (
     <Box component="form" autoComplete="off">
+      {/* Sudoku Toolbar */}
       <Box component="section" id="game-toolbar" className="sudoku-toolbar">
         <Box
           sx={{
@@ -73,7 +75,7 @@ function Sudoku() {
           <IconButton
             aria-label="Undo"
             size="small"
-            disabled={!undoStack.length}
+            disabled={!undoStack.length || status === 'completed'}
             sx={{ borderRadius: 0 }}
             onClick={() => undo()}
           >
@@ -83,7 +85,7 @@ function Sudoku() {
           <IconButton
             aria-label="Redo"
             size="small"
-            disabled={!redoStack.length}
+            disabled={!redoStack.length || status === 'completed'}
             sx={{ borderRadius: 0 }}
             onClick={() => redo()}
           >
@@ -91,20 +93,21 @@ function Sudoku() {
           </IconButton>
         </Box>
       </Box>
+
+      {/* Sudoku Board */}
       <Box component="section" id="board" className="sudoku-board">
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
-            const key = crypto.randomUUID();
-
             return (
               <SudokuCell
-                key={key}
+                key={crypto.randomUUID()}
                 ref={sudokuCellRef}
                 col={colIdx}
                 row={rowIdx}
                 editable={editableCells}
                 board={board}
                 value={value}
+                status={status}
                 onUpdate={(e) => handleInputChange(e, rowIdx, colIdx)}
                 onActivateHint={() =>
                   sudokuCellRef.current?.activateHint(rowIdx, colIdx)
@@ -114,6 +117,9 @@ function Sudoku() {
           })
         )}
       </Box>
+
+      {/* Sudoku Victory Modal */}
+      <VictoryModal />
     </Box>
   );
 }

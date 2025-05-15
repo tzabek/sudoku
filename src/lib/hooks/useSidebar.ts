@@ -11,7 +11,7 @@ export default function useSidebar() {
 
   const timer = useTimer({ game });
   const progressProps = { board, editable };
-  const isPaused = game.status === 'paused';
+  const isPaused = game.status === 'paused' || game.status === 'completed';
 
   return {
     actions: { start, clear, pause, resume },

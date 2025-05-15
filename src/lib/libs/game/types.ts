@@ -57,6 +57,7 @@ export interface ICell {
   editable: Editable;
   board: Board;
   value: number;
+  status: GameStatus;
   onUpdate: (
     e: ChangeEvent<HTMLInputElement>,
     row: number,
@@ -104,6 +105,7 @@ export type GameProps = {
   startedDate: number;
   updatedDate: number;
   completedDate: number;
+  gameWon: boolean;
   status: GameStatus;
   timerActive: boolean;
 };
