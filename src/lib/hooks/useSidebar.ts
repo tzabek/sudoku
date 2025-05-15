@@ -12,10 +12,11 @@ export default function useSidebar() {
   const timer = useTimer({ game });
   const progressProps = { board, editable };
   const isPaused = game.status === 'paused' || game.status === 'completed';
+  const isFinished = game.status === 'completed' && game.gameWon;
 
   return {
     actions: { start, clear, pause, resume },
-    data: { game, timer, progressProps, isPaused },
+    data: { game, timer, progressProps, isPaused, isFinished },
     menu: { showGameMenu, setShowGameMenu },
   };
 }

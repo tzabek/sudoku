@@ -46,7 +46,6 @@ $grid-size: 9;
 
       &[readonly] {
         cursor: not-allowed;
-        // pointer-events: none;
         user-select: none;
       }
     }

@@ -1,7 +1,15 @@
 import { ChangeEvent, use, useRef } from 'react';
 import { Box, Divider, IconButton } from '@mui/material';
-import { Undo, Redo } from '@mui/icons-material';
-import { SudokuCell, VictoryModal } from '..';
+import {
+  Undo,
+  Redo,
+  Pause,
+  PlayArrow,
+  DashboardCustomize,
+  SystemUpdateAlt,
+  GridView,
+} from '@mui/icons-material';
+import { SudokuCell, Timer, VictoryModal } from '..';
 import { createChangeBatch, ICellRef } from '../../lib/libs/game';
 import { deepCopy } from '../../lib/libs/shared';
 
@@ -10,19 +18,15 @@ import GameContext from '../../lib/context/game-context';
 import './Sudoku.scss';
 
 function Sudoku() {
+  const { game, start, clear, apply, undo, redo, mistake, resume, pause } =
+    use(GameContext);
   const {
-    game: {
-      game: board,
-      editableCells,
-      solvedGame: solution,
-      history: { undoStack, redoStack },
-      status,
-    },
-    apply,
-    undo,
-    redo,
-    mistake,
-  } = use(GameContext);
+    game: board,
+    editableCells,
+    solvedGame: solution,
+    history: { undoStack, redoStack },
+    status,
+  } = game;
 
   const sudokuCellRef = useRef<ICellRef>(null);
 
@@ -59,9 +63,18 @@ function Sudoku() {
 
   return (
     <Box component="form" autoComplete="off">
+      {/* Sudoku Timer */}
+      <Timer />
+
       {/* Sudoku Toolbar */}
-      <Box component="section" id="game-toolbar" className="sudoku-toolbar">
+      <Box
+        component="section"
+        id="game-toolbar"
+        className="sudoku-toolbar"
+        sx={{ display: 'flex' }}
+      >
         <Box
+          className="actions-toolbar"
           sx={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -70,8 +83,59 @@ function Sudoku() {
             borderRadius: 2,
             bgcolor: 'background.paper',
             color: 'text.secondary',
+            marginRight: 'auto',
           }}
         >
+          <IconButton
+            aria-label="Start new"
+            size="small"
+            sx={{ borderRadius: 0 }}
+            onClick={() => start()}
+          >
+            <DashboardCustomize />
+          </IconButton>
+          <Divider orientation="vertical" variant="middle" flexItem />
+          <IconButton
+            aria-label="Load game"
+            size="small"
+            sx={{ borderRadius: 0 }}
+          >
+            <SystemUpdateAlt />
+          </IconButton>
+          <Divider orientation="vertical" variant="middle" flexItem />
+          <IconButton
+            aria-label="Clear board"
+            size="small"
+            sx={{ borderRadius: 0 }}
+            onClick={() => clear(game)}
+          >
+            <GridView />
+          </IconButton>
+        </Box>
+        <Box
+          className="progress-toolbar"
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            color: 'text.secondary',
+            marginLeft: 'auto',
+          }}
+        >
+          <IconButton
+            aria-label={game.status === 'paused' ? 'Resume' : 'Pause'}
+            size="small"
+            sx={{ borderRadius: 0 }}
+            onClick={() =>
+              game.status === 'paused' ? resume(game) : pause(game)
+            }
+          >
+            {game.status === 'paused' ? <PlayArrow /> : <Pause />}
+          </IconButton>
+          <Divider orientation="vertical" variant="middle" flexItem />
           <IconButton
             aria-label="Undo"
             size="small"

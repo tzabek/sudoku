@@ -156,7 +156,7 @@ export function calculateScore(elapsed: number, mistakes: number) {
   const baseScore = 1000;
   const seconds = Math.floor(elapsed / baseScore);
   const timePenalty = seconds * 2; // 2 points off per second
-  const mistakePenalty = mistakes * 100; // 100 points off per mistake
+  const mistakePenalty = mistakes * 50; // 50 points off per mistake
   const score = baseScore - timePenalty - mistakePenalty;
 
   return Math.max(score, 0);

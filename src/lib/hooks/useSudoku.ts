@@ -13,6 +13,7 @@ import {
   Mistake,
   isBoardFull,
   isBoardSolved,
+  GameStatus,
 } from '../libs/game';
 import { loadTimer, removeTimer, TimerState } from '../libs/timer';
 import { deepCopy } from '../libs/shared';
@@ -29,6 +30,7 @@ export function sudokuReducer(
     case 'start': {
       const now = Date.now();
       const currentGame: GameProps = JSON.parse(JSON.stringify(state));
+      const status: GameStatus = currentGame.gameWon ? 'completed' : 'paused';
       const timer = loadTimer();
 
       // Save current game before creating a new one
@@ -36,7 +38,7 @@ export function sudokuReducer(
         const updatedGame: GameProps = {
           ...currentGame,
           updatedDate: now,
-          status: 'paused',
+          status,
           timerActive: false,
           timer: {
             ...timer,
@@ -164,6 +166,8 @@ export function sudokuReducer(
           redoStack: [lastBatch, ...redoStack],
         },
         updatedDate: Date.now(),
+        timerActive: true,
+        status: 'progress',
       };
     }
 
@@ -190,6 +194,8 @@ export function sudokuReducer(
           redoStack,
         },
         updatedDate: Date.now(),
+        timerActive: true,
+        status: 'progress',
       };
     }
 

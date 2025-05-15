@@ -11,12 +11,9 @@ import {
   ListSubheader,
   Typography,
 } from '@mui/material';
-import { green, pink } from '@mui/material/colors';
+import { pink } from '@mui/material/colors';
 import {
-  Pause,
-  PlayArrow,
   Extension,
-  AvTimer,
   ExpandMore,
   ExpandLess,
   DashboardCustomize,
@@ -24,20 +21,18 @@ import {
   BorderAll,
   CloudSync,
 } from '@mui/icons-material';
-import { ActionButton, NumberTracker, Progress } from '..';
+import { NumberTracker, Progress } from '..';
 import { useSidebar } from '../../lib/hooks';
-import { formatTime } from '../../lib/libs/shared';
 
 import './SidePanel.scss';
 
 function SidePanel() {
   const {
-    actions: { start, pause, resume, clear },
-    data: { game, timer, progressProps, isPaused },
+    actions: { start, clear },
+    data: { game, timer, progressProps },
     menu: { showGameMenu, setShowGameMenu },
   } = useSidebar();
   const { board, editable } = progressProps;
-  const { status } = game;
 
   return (
     <Sidebar mode="dark" showProfile={false}>
@@ -59,50 +54,6 @@ function SidePanel() {
                   Sudoku
                 </Typography>
               </Link>
-            </Box>
-
-            <Divider aria-hidden="true" component="div" />
-
-            <Box className="sidebar-header">
-              {/* Game timer */}
-              <Box className="game-info">
-                <Box className="game-timer">
-                  <AvTimer sx={{ color: isPaused ? pink[500] : green[500] }} />{' '}
-                  <Typography
-                    component="span"
-                    variant="caption"
-                    sx={{ display: 'block' }}
-                  >
-                    {formatTime(timer.elapsedMs)}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Game/Timer actions */}
-              {status !== 'completed' && (
-                <Box className="game-actions">
-                  <ActionButton
-                    aria-label={
-                      isPaused ? 'Game is paused' : 'Game is in progress'
-                    }
-                    size="medium"
-                    variant="contained"
-                    disableElevation
-                    startIcon={isPaused ? <PlayArrow /> : <Pause />}
-                    onClick={() => {
-                      if (isPaused) {
-                        resume(game);
-                        timer.resume();
-                      } else {
-                        pause(game);
-                        timer.pause();
-                      }
-                    }}
-                  >
-                    {isPaused ? 'Resume' : 'Pause'}
-                  </ActionButton>
-                </Box>
-              )}
             </Box>
 
             <Divider aria-hidden="true" component="div" />
