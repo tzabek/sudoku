@@ -68,12 +68,14 @@ export interface ICell {
     row: number,
     col: number
   ) => void;
+  onActivateFocus: (row: number, col: number) => void;
 }
 
 export interface ICellRef {
   activateHint: (row: number, col: number) => void;
   getActiveHint: () => HintProps;
   isActiveHint: () => boolean;
+  activateFocus: (row: number, col: number) => void;
 }
 
 export type HintProps = number[] | null;
@@ -83,6 +85,11 @@ export type CellChange = {
   col: number;
   previousValue: number;
   newValue: number;
+};
+
+export type CellFocus = {
+  row: number;
+  col: number;
 };
 
 export type ChangeBatch = {
