@@ -1,4 +1,4 @@
-import { ChangeEvent, use, useRef } from 'react';
+import { ChangeEvent, createRef, RefObject, use, useRef } from 'react';
 import { Box, Divider, IconButton } from '@mui/material';
 import {
   Undo,
@@ -20,15 +20,23 @@ import './Sudoku.scss';
 function Sudoku() {
   const { game, start, clear, apply, undo, redo, mistake, resume, pause } =
     use(GameContext);
-  const {
-    game: board,
-    editableCells,
-    solvedGame: solution,
-    history: { undoStack, redoStack },
-    status,
-  } = game;
+  const { game: board, editableCells, solvedGame, history, status } = game;
+  const { undoStack, redoStack } = history;
 
-  const sudokuCellRef = useRef<ICellRef>(null);
+  // const sudokuCellRef = useRef<ICellRef>(null);
+  const sudokuCellRef = useRef<Map<string, RefObject<ICellRef | null>>>(
+    new Map()
+  );
+
+  const setCellRef = (row: number, col: number) => {
+    const key = `${row}-${col}`;
+
+    if (!sudokuCellRef.current.has(key)) {
+      sudokuCellRef.current.set(key, createRef<ICellRef>());
+    }
+
+    return sudokuCellRef.current.get(key);
+  };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -47,12 +55,12 @@ function Sudoku() {
     newBoard[row][col] = newValue;
 
     // Log mistake
-    if (newValue !== solution[row][col]) {
+    if (newValue !== solvedGame[row][col]) {
       mistake({
         row,
         col,
         enteredValue: newValue,
-        correctValue: solution[row][col],
+        correctValue: solvedGame[row][col],
         timestamp: Date.now(),
       });
     }
@@ -165,17 +173,34 @@ function Sudoku() {
             return (
               <SudokuCell
                 key={crypto.randomUUID()}
-                ref={sudokuCellRef}
+                ref={setCellRef(rowIdx, colIdx)}
                 col={colIdx}
                 row={rowIdx}
                 editable={editableCells}
                 board={board}
                 value={value}
                 status={status}
-                onUpdate={(e) => handleInputChange(e, rowIdx, colIdx)}
-                onActivateHint={() =>
-                  sudokuCellRef.current?.activateHint(rowIdx, colIdx)
-                }
+                onUpdate={(e) => {
+                  handleInputChange(e, rowIdx, colIdx);
+                  setTimeout(() => {
+                    const key = `${rowIdx}-${colIdx}`;
+                    sudokuCellRef.current
+                      ?.get(key)
+                      ?.current?.activateFocus(rowIdx, colIdx);
+                  });
+                }}
+                onActivateFocus={() => {
+                  const key = `${rowIdx}-${colIdx}`;
+                  sudokuCellRef.current
+                    ?.get(key)
+                    ?.current?.activateFocus(rowIdx, colIdx);
+                }}
+                onActivateHint={() => {
+                  const key = `${rowIdx}-${colIdx}`;
+                  sudokuCellRef.current
+                    ?.get(key)
+                    ?.current?.activateHint(rowIdx, colIdx);
+                }}
               />
             );
           })

@@ -3,10 +3,17 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 import { Tooltip, Zoom } from '@mui/material';
-import { ALLOWED_INPUT, HintProps, ICell, ICellRef } from '../../lib/libs/game';
+import {
+  ALLOWED_INPUT,
+  CellFocus,
+  HintProps,
+  ICell,
+  ICellRef,
+} from '../../lib/libs/game';
 import { useCandidates } from '../../lib/hooks';
 
 function getCandidates(candidates: number[] | null) {
@@ -44,16 +51,19 @@ const SudokuCell = forwardRef(function SudokuCell(
     value,
     status,
     onUpdate,
+    onActivateFocus,
     onActivateHint,
   } = props;
 
   const [activeHint, setActiveHint] = useState<HintProps>(null);
+  const [focusedCell, setFocusedCell] = useState<CellFocus | null>(null);
+
+  const isComplete = status === 'completed';
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const classes = [
     'cell',
-    ...(!editable[y][x]
-      ? ['prefilled']
-      : [...(status === 'completed' ? ['solved'] : [])]),
+    ...(!editable[y][x] ? ['prefilled'] : [...(isComplete ? ['solved'] : [])]),
   ];
   const candidates = useCandidates(board, editable);
 
@@ -63,9 +73,18 @@ const SudokuCell = forwardRef(function SudokuCell(
     },
     getActiveHint: () => activeHint,
     isActiveHint: () => !!activeHint,
+    activateFocus: (row, col) => {
+      setFocusedCell({ row, col });
+      inputRef.current?.focus();
+    },
   }));
 
-  useEffect(() => {}, [activeHint, onActivateHint]);
+  useEffect(() => {}, [
+    activeHint,
+    onActivateHint,
+    focusedCell,
+    onActivateFocus,
+  ]);
 
   return (
     <Tooltip
@@ -77,20 +96,24 @@ const SudokuCell = forwardRef(function SudokuCell(
     >
       <div className={classes.join(' ')} data-x={x} data-y={y}>
         <input
+          ref={inputRef}
           autoComplete="off"
           id={`${y}-${x}`}
           type="text"
           maxLength={1}
           value={value === 0 ? '' : value}
           onChange={(e) => onUpdate(e, y, x)}
-          onFocus={() => setActiveHint(candidates[y][x])}
+          onFocus={() => {
+            setActiveHint(candidates[y][x]);
+            setFocusedCell({ row: y, col: x });
+          }}
           onBlur={() => setActiveHint(null)}
           onKeyDown={(e) => {
             if (!ALLOWED_INPUT.includes(e.key)) {
               e.preventDefault();
             }
           }}
-          readOnly={!editable[y][x] || status === 'completed'}
+          readOnly={!editable[y][x] || isComplete}
           data-row={y}
           data-col={x}
         />
