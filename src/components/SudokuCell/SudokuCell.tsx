@@ -60,12 +60,12 @@ const SudokuCell = forwardRef(function SudokuCell(
 
   const isComplete = status === 'completed';
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const candidates = useCandidates(board, editable);
+  const tooltipTitle = getCandidates(candidates[y][x]);
   const classes = [
     'cell',
     ...(!editable[y][x] ? ['prefilled'] : [...(isComplete ? ['solved'] : [])]),
   ];
-  const candidates = useCandidates(board, editable);
 
   useImperativeHandle(ref, () => ({
     activateHint: (row, col) => {
@@ -88,7 +88,7 @@ const SudokuCell = forwardRef(function SudokuCell(
 
   return (
     <Tooltip
-      title={getCandidates(candidates[y][x])}
+      title={tooltipTitle}
       placement="top"
       disableInteractive
       followCursor
