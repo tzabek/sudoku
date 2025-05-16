@@ -16,6 +16,9 @@ import {
 } from '../../lib/libs/game';
 import { useCandidates } from '../../lib/hooks';
 
+/**
+ * Generates a JSX element that displays information about Sudoku cell candidates.
+ */
 function getCandidates(candidates: number[] | null) {
   if (!candidates) {
     return null;
@@ -39,6 +42,31 @@ function getCandidates(candidates: number[] | null) {
   return body;
 }
 
+/**
+ * A React functional component representing a single cell in a Sudoku board.
+ * This component is designed to handle user interactions, display hints, and manage focus states.
+ * It uses React's `forwardRef` to expose imperative methods for external control.
+ *
+ * @component
+ *
+ * @remarks
+ * - The component uses `useImperativeHandle` to expose methods for activating hints and focus externally.
+ * - The `Tooltip` component is used to display candidate numbers as hints.
+ * - The cell is styled dynamically based on its state (e.g., prefilled, solved).
+ * - Input validation ensures only allowed keys are accepted.
+ *
+ * @method activateHint
+ * Activates a hint for the cell at the specified row and column.
+ *
+ * @method getActiveHint
+ * Retrieves the currently active hint for the cell.
+ *
+ * @method isActiveHint
+ * Checks if there is an active hint for the cell.
+ *
+ * @method activateFocus
+ * Activates focus for the cell at the specified row and column after cell update.
+ */
 const SudokuCell = forwardRef(function SudokuCell(
   props: ICell,
   ref: ForwardedRef<ICellRef>

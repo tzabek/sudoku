@@ -23,6 +23,25 @@ function Title({ number, count }: { number: number; count: number }) {
   );
 }
 
+/**
+ * NumberTracker is a React functional component designed for tracking the count of numbers
+ * in a Sudoku game board. It visually represents the frequency of each number (1 through 9)
+ * and provides progress indicators for how many times each number has been placed on the board.
+ *
+ * ## Features:
+ * - Displays numbers 1 through 9 with their respective counts.
+ * - Uses a progress bar to indicate the count of each number:
+ *   - Green: The number has been placed the maximum allowed times.
+ *   - Amber: The number is within the allowed range but not yet complete.
+ *   - Red: The number exceeds the maximum allowed occurrences.
+ * - Provides tooltips with additional details about each number's count.
+ *
+ * ## Notes:
+ * - The component uses `useMemo` to optimize the calculation of number counts, ensuring
+ *   it only recalculates when the `board` prop changes.
+ * - The `MAX_PER_NUMBER` constant is used to determine the maximum allowed occurrences
+ *   of each number in the Sudoku board.
+ */
 function NumberTracker(props: NumberTrackerProps) {
   const { board } = props;
 

@@ -17,6 +17,37 @@ import GameContext from '../../lib/context/game-context';
 
 import './Sudoku.scss';
 
+/**
+ * The `Sudoku` component represents the main Sudoku game interface.
+ * It provides a fully interactive Sudoku board, game controls, and a timer.
+ * The component manages the game state, user interactions, and game logic
+ * such as starting a new game, clearing the board, undoing/redoing moves,
+ * and handling mistakes.
+ *
+ * @component
+ *
+ * @remarks
+ * - The component uses the `GameContext` to manage the game state and actions.
+ * - It includes a toolbar for game actions, a Sudoku board for user interaction,
+ *   and a victory modal for when the game is completed.
+ * - Mistakes are logged when the user enters an incorrect value.
+ * - The board cells are managed using `useRef` to handle focus and hints dynamically.
+ *
+ * @dependencies
+ * - `GameContext`: Provides the game state and actions.
+ * - `Timer`: Displays the game timer.
+ * - `SudokuCell`: Represents individual cells in the Sudoku board.
+ * - `VictoryModal`: Displays a modal when the game is completed.
+ *
+ * @internal
+ * - The `handleInputChange` function manages user input and updates the board state.
+ * - The `setCellRef` function dynamically creates and manages references for board cells.
+ *
+ * @children
+ * - `Timer`: Displays the elapsed time for the game.
+ * - `SudokuCell`: Renders each cell in the Sudoku board.
+ * - `VictoryModal`: Displays a modal when the game is won.
+ */
 function Sudoku() {
   const { game, start, clear, apply, undo, redo, mistake, resume, pause } =
     use(GameContext);
