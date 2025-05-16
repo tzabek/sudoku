@@ -23,7 +23,6 @@ function Sudoku() {
   const { game: board, editableCells, solvedGame, history, status } = game;
   const { undoStack, redoStack } = history;
 
-  // const sudokuCellRef = useRef<ICellRef>(null);
   const sudokuCellRef = useRef<Map<string, RefObject<ICellRef | null>>>(
     new Map()
   );
