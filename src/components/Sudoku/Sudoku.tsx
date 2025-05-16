@@ -169,6 +169,8 @@ function Sudoku() {
       <Box component="section" id="board" className="sudoku-board">
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
+            const key = `${rowIdx}-${colIdx}`;
+
             return (
               <SudokuCell
                 key={crypto.randomUUID()}
@@ -182,20 +184,17 @@ function Sudoku() {
                 onUpdate={(e) => {
                   handleInputChange(e, rowIdx, colIdx);
                   setTimeout(() => {
-                    const key = `${rowIdx}-${colIdx}`;
                     sudokuCellRef.current
                       ?.get(key)
                       ?.current?.activateFocus(rowIdx, colIdx);
                   });
                 }}
                 onActivateFocus={() => {
-                  const key = `${rowIdx}-${colIdx}`;
                   sudokuCellRef.current
                     ?.get(key)
                     ?.current?.activateFocus(rowIdx, colIdx);
                 }}
                 onActivateHint={() => {
-                  const key = `${rowIdx}-${colIdx}`;
                   sudokuCellRef.current
                     ?.get(key)
                     ?.current?.activateHint(rowIdx, colIdx);
