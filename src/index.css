@@ -15,6 +15,7 @@ body {
 }
 
 #root .page-content main {
+  position: relative;
   width: 100%;
   background: #fff;
   display: inline-flex;

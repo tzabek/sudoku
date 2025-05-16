@@ -1,0 +1,30 @@
+#clock {
+  > div {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    background: #0f3854;
+    background: radial-gradient(ellipse at center, #0a2e38 0%, #000000 70%);
+    background-size: 100%;
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    color: #daf6ff;
+    justify-content: center;
+
+    .time,
+    .date {
+      text-shadow: 0 0 20px rgba(10, 175, 230, 1),
+        0 0 20px rgba(10, 175, 230, 0);
+      text-transform: uppercase;
+    }
+
+    .time {
+      letter-spacing: 0.05em;
+      font-size: 14px;
+    }
+
+    .date {
+      letter-spacing: 0.1em;
+      font-size: 11px;
+    }
+  }
+}
