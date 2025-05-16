@@ -1,38 +1,18 @@
+import { use } from 'react';
 import { Link } from 'react-router-dom';
 import { Sidebar } from 'react-mui-sidebar';
-import {
-  Box,
-  Collapse,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, List, ListSubheader, Typography } from '@mui/material';
 import { pink } from '@mui/material/colors';
-import {
-  Extension,
-  ExpandMore,
-  ExpandLess,
-  DashboardCustomize,
-  SportsEsports,
-  BorderAll,
-  CloudSync,
-} from '@mui/icons-material';
+import { Extension } from '@mui/icons-material';
 import { NumberTracker, Progress } from '..';
-import { useSidebar } from '../../lib/hooks';
+
+import GameContext from '../../lib/context/game-context';
 
 import './SidePanel.scss';
 
 function SidePanel() {
-  const {
-    actions: { start, clear },
-    data: { game, timer, progressProps },
-    menu: { showGameMenu, setShowGameMenu },
-  } = useSidebar();
-  const { board, editable } = progressProps;
+  const { game } = use(GameContext);
+  const { game: board, editableCells: editable } = game;
 
   return (
     <Sidebar mode="dark" showProfile={false}>
@@ -73,46 +53,7 @@ function SidePanel() {
             </Box>
           </ListSubheader>
         }
-      >
-        <Divider aria-hidden="true" component="div" />
-        <ListItemButton onClick={() => setShowGameMenu(!showGameMenu)}>
-          <ListItemIcon>
-            <SportsEsports />
-          </ListItemIcon>
-          <ListItemText primary="Game menu" />
-          {showGameMenu ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={showGameMenu} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton
-              sx={{ pl: 4 }}
-              onClick={() => {
-                start();
-                timer.start();
-              }}
-            >
-              <ListItemIcon>
-                <DashboardCustomize />
-              </ListItemIcon>
-              <ListItemText primary="Start game" />
-            </ListItemButton>
-
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <CloudSync />
-              </ListItemIcon>
-              <ListItemText primary="Load game" />
-            </ListItemButton>
-
-            <ListItemButton sx={{ pl: 4 }} onClick={() => clear(game)}>
-              <ListItemIcon>
-                <BorderAll />
-              </ListItemIcon>
-              <ListItemText primary="Clear board" />
-            </ListItemButton>
-          </List>
-        </Collapse>
-      </List>
+      />
     </Sidebar>
   );
 }

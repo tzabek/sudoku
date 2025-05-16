@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import { EmojiEvents } from '@mui/icons-material';
-import { formatTime } from '../../lib/libs/shared';
+import { getFormattedTime } from '../../lib/libs/shared';
 import { calculateScore } from '../../lib/libs/game';
 
 import GameContext from '../../lib/context/game-context';
@@ -60,7 +60,7 @@ function VictoryModal() {
 
         <Box mt={2}>
           <Typography>
-            <strong>Time:</strong> {formatTime(elapsedMs)}
+            <strong>Time:</strong> {getFormattedTime(elapsedMs)}
           </Typography>
           <Typography>
             <strong>Mistakes:</strong> {mistakes.length}
