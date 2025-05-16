@@ -10,6 +10,24 @@ import {
   UseTimerProps,
 } from '../libs/timer';
 
+/**
+ * Reducer function to manage the state of a timer. Handles various actions
+ * such as creating, starting, pausing, resuming, ticking, and loading a timer.
+ *
+ * Action Types:
+ * - `'create-timer'`: Initializes a new timer state using the provided payload.
+ * - `'start-timer'`: Starts the timer, setting the start date and resetting elapsed time.
+ * - `'pause-timer'`: Pauses the timer, calculating and storing the elapsed time.
+ * - `'resume-timer'`: Resumes the timer from a paused state.
+ * - `'tick-timer'`: Updates the elapsed time while the timer is running.
+ * - `'load-timer'`: Loads a previously saved timer state.
+ *
+ * Notes:
+ * - The `'pause-timer'` action has no effect if the timer is not currently running.
+ * - The `'resume-timer'` action has no effect if the timer is not paused.
+ * - The `'tick-timer'` action updates the elapsed time only if the timer is running
+ *   and not paused.
+ */
 function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
   switch (action.type) {
     case 'create-timer':
@@ -70,6 +88,15 @@ function timerReducer(state: TimerState, action: TimerActionProps): TimerState {
   }
 }
 
+/**
+ * Custom React hook for managing a timer with start, pause, and resume functionality.
+ * The timer state is persisted and restored automatically, and it updates in real-time.
+ *
+ * @remarks
+ * - The timer state is saved to persistent storage whenever it changes.
+ * - The timer automatically resumes or pauses based on the `timerActive` property.
+ * - The hook uses `setInterval` to update the timer in real-time while it is running.
+ */
 export default function useTimer(props: UseTimerProps): ITimerReturn {
   const {
     game: { id, startedDate, timerActive },

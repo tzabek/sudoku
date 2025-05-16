@@ -1,6 +1,45 @@
 /* eslint-disable no-param-reassign */
 import { Board, ISudoku } from '.';
 
+/**
+ * Creates a Sudoku game utility object with methods for generating, solving,
+ * and manipulating Sudoku boards.
+ *
+ * Factory function to create a Sudoku game object with various utility methods.
+ *
+ * @method start
+ * Initializes the editable state of the Sudoku board. Marks cells as editable if their value is `0`.
+ *
+ * @method generate
+ * Generates a new Sudoku puzzle with a solution. Fills the board, removes numbers to create a puzzle, and returns both the puzzle and its solution.
+ *
+ * @method shuffle
+ * Shuffles an array randomly using the Fisher-Yates algorithm.
+ *
+ * @method copy
+ * Creates a deep copy of a Sudoku board.
+ *
+ * @method fill
+ * Recursively fills a Sudoku board with valid numbers to create a complete solution.
+ *
+ * @method solve
+ * Solves a Sudoku board using backtracking. Can also count the number of solutions and stop based on a condition.
+ *
+ * @method remove
+ * Removes numbers from a filled Sudoku board to create a puzzle with a unique solution.
+ *
+ * @method clear
+ * Clears the editable cells of a Sudoku board, resetting their values to `0`.
+ *
+ * @method isValid
+ * Checks if placing a number in a specific cell is valid according to Sudoku rules.
+ *
+ * @method generateNumberArray
+ * Generates an array of sequential numbers starting from 1.
+ *
+ * @method formatTime
+ * Formats a time duration in seconds into a `MM:SS` string format.
+ */
 export default function createSudoku(): ISudoku {
   return {
     start(board) {

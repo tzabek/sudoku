@@ -26,6 +26,13 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
+/**
+ * A React functional component that renders a progress bar for a Sudoku game.
+ *
+ * The progress bar visually represents the percentage of the Sudoku board that has been completed.
+ * It uses the `useProgress` hook to calculate the progress based on the provided `board` and `editable` props.
+ * The progress percentage is displayed as a label on top of the progress bar.
+ */
 function Progress(props: ProgressProps) {
   const { board, editable } = props;
 

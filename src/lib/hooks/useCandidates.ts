@@ -1,6 +1,17 @@
 import { useMemo } from 'react';
 import { Board, Candidates, Editable } from '../libs/game';
 
+/**
+ * A custom hook that calculates the possible candidates for each cell in a Sudoku board.
+ * It determines which numbers (1-9) can be placed in each empty and editable cell
+ * based on the current state of the board and Sudoku rules.
+ *
+ * @remarks
+ * - The hook uses `useMemo` to optimize performance by recalculating candidates
+ *   only when the `board` or `editable` matrices change.
+ * - The candidates for each cell are determined by checking the numbers already
+ *   used in the same row, column, and 3x3 box.
+ */
 export default function useCandidates(
   board: Board,
   editable: Editable

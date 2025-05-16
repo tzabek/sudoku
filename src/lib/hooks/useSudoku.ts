@@ -18,6 +18,38 @@ import {
 import { loadTimer, removeTimer, TimerState } from '../libs/timer';
 import { deepCopy } from '../libs/shared';
 
+/**
+ * Reducer function for managing the state of a Sudoku game.
+ *
+ * ### Action Types:
+ * - `'create'`: Creates a new Sudoku game.
+ * - `'start'`: Starts a new game, saving the current game state and resetting the timer.
+ * - `'load'`: Loads a game state from the provided payload.
+ * - `'clear'`: Clears the board by removing values from non-editable cells.
+ * - `'apply'`: Applies a batch of changes to the board and updates the game status.
+ * - `'undo'`: Reverts the last batch of changes made to the board.
+ * - `'redo'`: Reapplies the last undone batch of changes to the board.
+ * - `'pause'`: Pauses the game and updates the state with the provided game data.
+ * - `'resume'`: Resumes the game and updates the state with the provided game data.
+ * - `'mistake'`: Records a mistake made by the player.
+ *
+ * ### State Properties:
+ * - `game`: The current state of the Sudoku board.
+ * - `history`: Tracks undo and redo stacks for board changes.
+ * - `status`: The current status of the game (`'progress'`, `'paused'`, `'completed'`, etc.).
+ * - `timerActive`: Indicates whether the game timer is active.
+ * - `timer`: Tracks the timer state, including elapsed time and pause information.
+ * - `gameWon`: A boolean indicating whether the game has been won.
+ * - `mistakes`: An array of mistakes made by the player.
+ * - `updatedDate`: A timestamp of the last state update.
+ * - `completedDate`: A timestamp of when the game was completed.
+ *
+ * ### Notes:
+ * - The reducer ensures immutability by creating deep copies of the state when necessary.
+ * - The `apply` action checks if the board is full and solved to determine the game status.
+ * - Undo and redo actions manage the history stacks to allow reverting or reapplying changes.
+ * - Timer-related actions (`start`, `pause`, `resume`) update the timer state accordingly.
+ */
 export function sudokuReducer(
   state: GameProps,
   action: GameActionProps
@@ -236,6 +268,20 @@ export function sudokuReducer(
   }
 }
 
+/**
+ * A custom hook for managing the state and actions of a Sudoku game.
+ *
+ * This hook provides a context value containing the current game state and
+ * various actions to manipulate the game, such as creating a new game,
+ * starting, pausing, resuming, applying changes, undoing, redoing, clearing,
+ * and recording mistakes. It also handles loading and saving the game state
+ * to persistent storage.
+ *
+ * @remarks
+ * - The game state is managed using a `useReducer` hook with a `sudokuReducer`.
+ * - The game is automatically loaded from storage on initialization, and
+ *   changes to the game state are saved to storage.
+ */
 export function useSudoku() {
   const [state, dispatch] = useReducer(sudokuReducer, INITIAL_SUDOKU);
 

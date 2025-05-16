@@ -1,6 +1,33 @@
 import { GameProps, IGameStorage, SavedGames } from '.';
 import { STORAGE } from '../shared';
 
+/**
+ * Creates a game storage utility for managing game states in localStorage.
+ *
+ * This utility provides methods to retrieve, add, update, and manage game states
+ * stored in the browser's localStorage under a specific key. It ensures that
+ * game states are serialized and deserialized properly and handles scenarios
+ * where localStorage might not be accessible or contain invalid data.
+ *
+ * @method getAll
+ * Retrieves all saved game data from localStorage.
+ *
+ * @method get
+ * Retrieves a specific game state by its ID.
+ *
+ * @method set
+ * Saves a game state to localStorage. If the game already exists, it updates it;
+ * otherwise, it adds a new game or creates a new storage entry.
+ *
+ * @method add
+ * Adds a new game state to the existing saved games in localStorage.
+ *
+ * @method create
+ * Creates a new storage entry in localStorage with the given game state.
+ *
+ * @method update
+ * Updates an existing game state in localStorage.
+ */
 export default function createGameStorage(): IGameStorage {
   return {
     getAll() {
