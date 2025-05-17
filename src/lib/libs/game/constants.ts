@@ -79,7 +79,9 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   logMistake: () => {},
   toggleNotesMode: () => {},
   toggleCandidate: () => {},
-  clearNotes: () => {},
+  clearCandidates: () => {},
+  clearAllCandidates: () => {},
+  removeCandidateFromPeers: () => {},
 };
 
 export const DIFFICULTY = [

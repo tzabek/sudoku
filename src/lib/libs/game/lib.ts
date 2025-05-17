@@ -146,7 +146,7 @@ export function generateClearBoardChanges(board: Board, editable: Editable) {
     }
   }
 
-  const clearCells = sudoku.createBoardFromNumbers(clearBoard);
+  const clearCells = sudoku.createEnhancedBoard(clearBoard);
 
   return { changes, clearBoard, clearCells };
 }

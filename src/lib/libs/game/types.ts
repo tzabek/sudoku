@@ -37,7 +37,7 @@ export type GameProps = {
 export interface ISudoku {
   start: (board: Board) => { editable: Editable };
   generate: () => { board: Board; cells: BoardCell; solution: Board };
-  createBoardFromNumbers: (numbers: Board) => BoardCell;
+  createEnhancedBoard: (numbers: Board) => BoardCell;
   shuffle: (arr: number[]) => number[];
   copy: (board: Board) => Board;
   fill: (board: Board) => boolean;
@@ -75,7 +75,9 @@ export interface IGameContext {
   logMistake: (mistake: Mistake) => void;
   toggleNotesMode: () => void;
   toggleCandidate: (row: number, col: number, value: number) => void;
-  clearNotes: (row: number, col: number) => void;
+  clearCandidates: (row: number, col: number) => void;
+  clearAllCandidates: () => void;
+  removeCandidateFromPeers: (row: number, col: number, value: number) => void;
 }
 
 export type GameActionProps =
@@ -94,7 +96,12 @@ export type GameActionProps =
       type: 'toggle-candidate';
       payload: { row: number; col: number; value: number };
     }
-  | { type: 'clear-notes'; payload: { row: number; col: number } };
+  | { type: 'clear-candidates'; payload: { row: number; col: number } }
+  | { type: 'clear-all-candidates' }
+  | {
+      type: 'remove-candidate-from-peers';
+      payload: { row: number; col: number; value: number };
+    };
 
 export interface ICell {
   col: number;

@@ -7,6 +7,7 @@ import {
   Redo,
   SystemUpdateAlt,
   Undo,
+  Backspace,
 } from '@mui/icons-material';
 import {
   Box,
@@ -86,7 +87,8 @@ function Toolbar() {
 }
 
 function ToolbarActions() {
-  const { game, start, clear } = use(GameContext);
+  const { game, start, clear, clearAllCandidates } = use(GameContext);
+  const { notesMode } = game;
 
   return (
     <Box
@@ -122,6 +124,16 @@ function ToolbarActions() {
         onClick={() => clear(game)}
       >
         <GridView />
+      </IconButton>
+      <Divider orientation="vertical" variant="middle" flexItem />
+      <IconButton
+        aria-label="Clear all notes"
+        size="small"
+        sx={{ borderRadius: 0 }}
+        onClick={() => clearAllCandidates()}
+        disabled={!notesMode}
+      >
+        <Backspace />
       </IconButton>
     </Box>
   );

@@ -22,21 +22,56 @@ import { deepCopy } from '../libs/shared';
  * Reducer function for managing the state of a Sudoku game.
  *
  * ### Action Types:
- * - `'create'`: Creates a new Sudoku game.
- * - `'start'`: Starts a new game, saving the current game state and resetting the timer.
- * - `'load'`: Loads a game state from the provided payload.
- * - `'clear'`: Clears the board by removing values from non-editable cells.
- * - `'applyBatch'`: Applies a batch of changes to the board and updates the game status.
- * - `'undo'`: Reverts the last batch of changes made to the board.
- * - `'redo'`: Reapplies the last undone batch of changes to the board.
- * - `'pause'`: Pauses the game and updates the state with the provided game data.
- * - `'resume'`: Resumes the game and updates the state with the provided game data.
- * - `'logMistake'`: Records a mistake made by the player.
- * - `'toggleNotesMode'`: Toggles between:
- *    - 'normal mode': user inputs a number to a cell
- *    - 'notes mode': adds/removes small "candidate" numbers as pencil marks
- * - `'toggleCandidate'`: Records a candidate for a cell provided by user
- * - `'clearNotes'`: Clears all cell candidates provided by user
+ * @emits @method create
+ * Creates a new Sudoku game.
+ *
+ * @emits @method start
+ * Starts a new game, saving the current game state and resetting the timer.
+ *
+ * @emits @method load
+ * Loads a game state from the provided payload.
+ *
+ * @emits @method clear
+ * Clears the board by removing values from non-editable cells.
+ *
+ * @emits @method apply-batch
+ * Applies a batch of changes to the board and updates the game status.
+ *
+ * @emits @method undo
+ * Reverts the last batch of changes made to the board.
+ *
+ * @emits @method redo
+ * Reapplies the last undone batch of changes to the board.
+ *
+ * @emits @method pause
+ * Pauses the game and updates the state with the provided game data.
+ *
+ * @emits @method resume
+ * Resumes the game and updates the state with the provided game data.
+ *
+ * @emits @method log-mistake
+ * Records a mistake made by the player.
+ *
+ * @emits @method toggle-notes-mode
+ * Toggles between:
+ *    - `'normal mode'`: user inputs a number to a cell
+ *    - `'notes mode'`: adds/removes small "candidate" numbers as pencil marks
+ *
+ * @emits @method toggle-candidate
+ * Records a candidate for a cell provided by user
+ *
+ * @emits @method clear-candidates
+ * Clears all cell-specific candidates provided by user
+ *
+ * @emits @method clear-all-candidates
+ * Clears all cells from candidates
+ *
+ * @emits @method remove-candidate-from-peers
+ * When a value is placed in a cell in 'normal mode'
+ *    - automatically removes that value from the 'candidates' arrays of all other cells in:
+ *      - the same row
+ *      - the same column
+ *      - the same 3x3 block
  *
  * ### State Properties:
  * - `game`: The current state of the Sudoku board.
@@ -78,19 +113,22 @@ export function sudokuReducer(
           currentGame.editableCells
         );
 
+        // Save current Timer state
+        const savedTimer = {
+          ...timer,
+          pausedDate: now,
+          startDate: null,
+          elapsedBeforePause: timer.elapsedMs,
+          elapsedMs: timer.elapsedMs,
+        };
+
         const updatedGame: GameProps = {
           ...currentGame,
           cells: clearCells,
           updatedDate: now,
           status,
           timerActive: false,
-          timer: {
-            ...timer,
-            pausedDate: now,
-            startDate: null,
-            elapsedBeforePause: timer.elapsedMs,
-            elapsedMs: timer.elapsedMs,
-          },
+          timer: savedTimer,
         };
 
         saveGame({ ...state, ...updatedGame });
@@ -336,7 +374,7 @@ export function sudokuReducer(
       return { ...state, cells: newCells };
     }
 
-    case 'clear-notes': {
+    case 'clear-candidates': {
       const { row, col } = action.payload;
 
       const newCells = deepCopy(state.cells);
@@ -346,6 +384,51 @@ export function sudokuReducer(
       return {
         ...state,
         cells: newCells,
+      };
+    }
+
+    case 'clear-all-candidates': {
+      const { cells } = state;
+
+      const updatedCells = deepCopy(cells).map((row) =>
+        row.map((cell) => ({ ...cell, candidates: [] }))
+      );
+
+      return {
+        ...state,
+        cells: updatedCells,
+      };
+    }
+
+    case 'remove-candidate-from-peers': {
+      const { row, col, value } = action.payload;
+      const { cells } = state;
+
+      const updatedCells = cells.map((r, rowIdx) =>
+        r.map((cell, colIdx) => {
+          const sameRow = rowIdx === row;
+          const sameCol = colIdx === col;
+          const sameBlock =
+            Math.floor(rowIdx / 3) === Math.floor(row / 3) &&
+            Math.floor(colIdx / 3) === Math.floor(col / 3);
+          const isSameCell = rowIdx === row && colIdx === col;
+
+          if (!isSameCell && (sameRow || sameCol || sameBlock)) {
+            return {
+              ...cell,
+              candidates: (
+                cell.candidates?.filter((n) => n !== value) || []
+              ).sort(),
+            };
+          }
+
+          return cell;
+        })
+      );
+
+      return {
+        ...state,
+        cells: updatedCells,
       };
     }
 
@@ -417,8 +500,14 @@ export function useSudoku() {
         type: 'toggle-candidate',
         payload: { row, col, value },
       }),
-    clearNotes: (row: number, col: number) =>
-      dispatch({ type: 'clear-notes', payload: { row, col } }),
+    clearCandidates: (row: number, col: number) =>
+      dispatch({ type: 'clear-candidates', payload: { row, col } }),
+    clearAllCandidates: () => dispatch({ type: 'clear-all-candidates' }),
+    removeCandidateFromPeers: (row: number, col: number, value: number) =>
+      dispatch({
+        type: 'remove-candidate-from-peers',
+        payload: { row, col, value },
+      }),
   };
 
   return { contextValue };

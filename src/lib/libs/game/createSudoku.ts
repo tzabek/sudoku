@@ -34,7 +34,7 @@ import { Board, ISudoku } from '.';
  * @method isValid
  * Checks if placing a number in a specific cell is valid according to Sudoku rules.
  *
- * @method createBoardFromNumbers
+ * @method createEnhancedBoard
  * Upgraded board representation of richer structure allowing tracking candidates and distinguishing between
  * initial and user-entered values
  *
@@ -60,7 +60,7 @@ export default function createSudoku(): ISudoku {
       this.remove(board, 40);
 
       // Required for user chosen cell candidates
-      const cells = this.createBoardFromNumbers(board);
+      const cells = this.createEnhancedBoard(board);
 
       return { board, cells, solution };
     },
@@ -187,7 +187,7 @@ export default function createSudoku(): ISudoku {
       return true;
     },
 
-    createBoardFromNumbers(numbers) {
+    createEnhancedBoard(numbers) {
       return numbers.map((row) =>
         row.map((value) => ({ value, candidates: [], isInitial: value !== 0 }))
       );

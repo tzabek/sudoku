@@ -41,7 +41,13 @@ import './Sudoku.scss';
  * - `Toolbar`: Renders a toolbar for game actions
  */
 function Sudoku() {
-  const { game, applyBatch, logMistake, toggleCandidate } = use(GameContext);
+  const {
+    game,
+    applyBatch,
+    logMistake,
+    toggleCandidate,
+    removeCandidateFromPeers,
+  } = use(GameContext);
   const {
     game: board,
     cells,
@@ -91,6 +97,9 @@ function Sudoku() {
 
       // Apply changes
       applyBatch(createChangeBatch(board, newBoard));
+
+      // Remove candidate from peers
+      removeCandidateFromPeers(row, col, val);
     }
   };
 
@@ -123,6 +132,7 @@ function Sudoku() {
                 onUpdate={(r, c, v) => {
                   handleInputChange(r, c, v);
 
+                  // Don't re-focus in 'notes mode'
                   if (!notesMode) {
                     setTimeout(() => {
                       sudokuCellRef.current
