@@ -6,14 +6,39 @@ import { TimerState } from '../timer';
 export type Board = number[][];
 export type Editable = boolean[][];
 export type Candidates = (number[] | null)[][];
+export type Cell = {
+  value: number; // Final value (0 if empty)
+  candidates: number[]; // Note candidates
+  isInitial: boolean; // True if it's part of original puzzle
+};
+export type BoardCell = Cell[][];
 
 export type Difficulty = (typeof DIFFICULTY)[number];
 
 export type GameStatus = (typeof GAME_STATUS)[number];
 
+export type GameProps = {
+  id: string;
+  game: Board;
+  cells: BoardCell;
+  history: HistoryState;
+  solvedGame: Board;
+  editableCells: Editable;
+  mistakes: Mistake[];
+  timer: TimerState | null;
+  startedDate: number;
+  updatedDate: number;
+  completedDate: number;
+  gameWon: boolean;
+  status: GameStatus;
+  timerActive: boolean;
+  notesMode: boolean;
+};
+
 export interface ISudoku {
   start: (board: Board) => { editable: Editable };
-  generate: () => { board: Board; solution: Board };
+  generate: () => { board: Board; cells: BoardCell; solution: Board };
+  createBoardFromNumbers: (numbers: Board) => BoardCell;
   shuffle: (arr: number[]) => number[];
   copy: (board: Board) => Board;
   fill: (board: Board) => boolean;
@@ -43,19 +68,41 @@ export interface IGameContext {
   create: (gameState: GameProps) => void;
   start: () => void;
   clear: (gameState: GameProps) => void;
-  apply: (batch: ChangeBatch) => void;
+  applyBatch: (batch: ChangeBatch) => void;
   undo: () => void;
   redo: () => void;
   pause: (gameState: GameProps) => void;
   resume: (gameState: GameProps) => void;
-  mistake: (mistake: Mistake) => void;
+  logMistake: (mistake: Mistake) => void;
+  toggleNotesMode: () => void;
+  toggleCandidate: (row: number, col: number, value: number) => void;
+  clearNotes: (row: number, col: number) => void;
 }
+
+export type GameActionProps =
+  | { type: 'create' }
+  | { type: 'start' }
+  | { type: 'apply-batch'; payload: { batch: ChangeBatch } }
+  | { type: 'undo' }
+  | { type: 'redo' }
+  | { type: 'clear' }
+  | { type: 'log-mistake'; payload: Mistake }
+  | { type: 'load'; payload: GameProps }
+  | { type: 'pause'; payload: { game: GameProps } }
+  | { type: 'resume'; payload: { game: GameProps } }
+  | { type: 'toggle-notes-mode' }
+  | {
+      type: 'toggle-candidate';
+      payload: { row: number; col: number; value: number };
+    }
+  | { type: 'clear-notes'; payload: { row: number; col: number } };
 
 export interface ICell {
   col: number;
   row: number;
   editable: Editable;
   board: Board;
+  cell: Cell;
   value: number;
   status: GameStatus;
   onUpdate: (
@@ -73,8 +120,6 @@ export interface ICell {
 
 export interface ICellRef {
   activateHint: (row: number, col: number) => void;
-  getActiveHint: () => HintProps;
-  isActiveHint: () => boolean;
   activateFocus: (row: number, col: number) => void;
 }
 
@@ -100,34 +145,6 @@ export type HistoryState = {
   undoStack: ChangeBatch[];
   redoStack: ChangeBatch[];
 };
-
-export type GameProps = {
-  id: string;
-  game: Board;
-  history: HistoryState;
-  solvedGame: Board;
-  editableCells: Editable;
-  mistakes: Mistake[];
-  timer: TimerState | null;
-  startedDate: number;
-  updatedDate: number;
-  completedDate: number;
-  gameWon: boolean;
-  status: GameStatus;
-  timerActive: boolean;
-};
-
-export type GameActionProps =
-  | { type: 'create' }
-  | { type: 'start' }
-  | { type: 'apply'; payload: { batch: ChangeBatch } }
-  | { type: 'undo' }
-  | { type: 'redo' }
-  | { type: 'clear' }
-  | { type: 'mistake'; payload: Mistake }
-  | { type: 'load'; payload: GameProps }
-  | { type: 'pause'; payload: { game: GameProps } }
-  | { type: 'resume'; payload: { game: GameProps } };
 
 export type SavedGames = {
   activeId: string;

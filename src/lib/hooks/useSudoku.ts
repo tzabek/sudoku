@@ -26,12 +26,17 @@ import { deepCopy } from '../libs/shared';
  * - `'start'`: Starts a new game, saving the current game state and resetting the timer.
  * - `'load'`: Loads a game state from the provided payload.
  * - `'clear'`: Clears the board by removing values from non-editable cells.
- * - `'apply'`: Applies a batch of changes to the board and updates the game status.
+ * - `'applyBatch'`: Applies a batch of changes to the board and updates the game status.
  * - `'undo'`: Reverts the last batch of changes made to the board.
  * - `'redo'`: Reapplies the last undone batch of changes to the board.
  * - `'pause'`: Pauses the game and updates the state with the provided game data.
  * - `'resume'`: Resumes the game and updates the state with the provided game data.
- * - `'mistake'`: Records a mistake made by the player.
+ * - `'logMistake'`: Records a mistake made by the player.
+ * - `'toggleNotesMode'`: Toggles between:
+ *    - 'normal mode': user inputs a number to a cell
+ *    - 'notes mode': adds/removes small "candidate" numbers as pencil marks
+ * - `'toggleCandidate'`: Records a candidate for a cell provided by user
+ * - `'clearNotes'`: Clears all cell candidates provided by user
  *
  * ### State Properties:
  * - `game`: The current state of the Sudoku board.
@@ -100,7 +105,7 @@ export function sudokuReducer(
     case 'clear': {
       const { game: board, editableCells: editable } = state;
 
-      const { changes, clearBoard } = generateClearBoardChanges(
+      const { changes, clearBoard, clearCells } = generateClearBoardChanges(
         board,
         editable
       );
@@ -113,6 +118,7 @@ export function sudokuReducer(
       return {
         ...state,
         game: clearBoard,
+        cells: clearCells,
         history: {
           undoStack: [...state.history.undoStack, { changes }],
           redoStack: [],
@@ -121,16 +127,25 @@ export function sudokuReducer(
       };
     }
 
-    case 'apply': {
+    case 'apply-batch': {
       const { batch } = action.payload;
       const { changes } = batch;
-      const { status, game } = state;
+      const { status, game, cells } = state;
 
       const now = Date.now();
       const newBoard = deepCopy(game);
+      const newCells = deepCopy(cells);
 
       changes.forEach(({ row, col, newValue }) => {
         newBoard[row][col] = newValue;
+
+        const cell = newCells[row][col];
+
+        newCells[row][col] = {
+          ...cell,
+          value: newValue,
+          candidates: [],
+        };
       });
 
       const isFull = isBoardFull(newBoard);
@@ -162,6 +177,7 @@ export function sudokuReducer(
       return {
         ...state,
         game: newBoard,
+        cells: newCells,
         history: {
           undoStack: [...state.history.undoStack, batch],
           redoStack: [],
@@ -185,14 +201,24 @@ export function sudokuReducer(
       }
 
       const newBoard = deepCopy(state.game);
+      const newCells = deepCopy(state.cells);
 
       lastBatch.changes.forEach(({ row, col, previousValue }) => {
         newBoard[row][col] = previousValue;
+
+        const cell = newCells[row][col];
+
+        newCells[row][col] = {
+          ...cell,
+          value: previousValue,
+          candidates: [],
+        };
       });
 
       return {
         ...state,
         game: newBoard,
+        cells: newCells,
         history: {
           undoStack,
           redoStack: [lastBatch, ...redoStack],
@@ -213,14 +239,24 @@ export function sudokuReducer(
       }
 
       const newBoard = deepCopy(state.game);
+      const newCells = deepCopy(state.cells);
 
       nextBatch.changes.forEach(({ row, col, newValue }) => {
         newBoard[row][col] = newValue;
+
+        const cell = newCells[row][col];
+
+        newCells[row][col] = {
+          ...cell,
+          value: newValue,
+          candidates: [],
+        };
       });
 
       return {
         ...state,
         game: newBoard,
+        cells: newCells,
         history: {
           undoStack: [...undoStack, nextBatch],
           redoStack,
@@ -255,10 +291,54 @@ export function sudokuReducer(
       };
     }
 
-    case 'mistake': {
+    case 'log-mistake': {
       return {
         ...state,
         mistakes: [...state.mistakes, action.payload],
+      };
+    }
+
+    case 'toggle-notes-mode': {
+      return {
+        ...state,
+        notesMode: !state.notesMode,
+      };
+    }
+
+    case 'toggle-candidate': {
+      const { row, col, value } = action.payload;
+      const { cells } = state;
+
+      const newCells = deepCopy(cells);
+      const cell = newCells[row][col];
+
+      if (cell.value !== 0 || cell.isInitial) {
+        return state;
+      }
+
+      const exists = cell.candidates.includes(value);
+      const newCandidates = exists
+        ? cell.candidates.filter((n) => n !== value)
+        : [...cell.candidates, value].sort();
+
+      newCells[row][col] = {
+        ...cell,
+        candidates: newCandidates,
+      };
+
+      return { ...state, cells: newCells };
+    }
+
+    case 'clear-notes': {
+      const { row, col } = action.payload;
+
+      const newCells = deepCopy(state.cells);
+
+      newCells[row][col].candidates = [];
+
+      return {
+        ...state,
+        cells: newCells,
       };
     }
 
@@ -317,13 +397,21 @@ export function useSudoku() {
     start: () => dispatch({ type: 'start' }),
     pause: () => dispatch({ type: 'pause', payload: { game: state } }),
     resume: () => dispatch({ type: 'resume', payload: { game: state } }),
-    apply: (batch: ChangeBatch) =>
-      dispatch({ type: 'apply', payload: { batch } }),
+    applyBatch: (batch: ChangeBatch) =>
+      dispatch({ type: 'apply-batch', payload: { batch } }),
     undo: () => dispatch({ type: 'undo' }),
     redo: () => dispatch({ type: 'redo' }),
     clear: () => dispatch({ type: 'clear' }),
-    mistake: (mistake: Mistake) =>
-      dispatch({ type: 'mistake', payload: mistake }),
+    logMistake: (mistake: Mistake) =>
+      dispatch({ type: 'log-mistake', payload: mistake }),
+    toggleNotesMode: () => dispatch({ type: 'toggle-notes-mode' }),
+    toggleCandidate: (row: number, col: number, value: number) =>
+      dispatch({
+        type: 'toggle-candidate',
+        payload: { row, col, value },
+      }),
+    clearNotes: (row: number, col: number) =>
+      dispatch({ type: 'clear-notes', payload: { row, col } }),
   };
 
   return { contextValue };

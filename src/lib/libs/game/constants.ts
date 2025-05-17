@@ -5,6 +5,7 @@ import {
   IGameContext,
   SavedGames,
   HistoryState,
+  Cell,
 } from '.';
 
 const NON_NUMERIC_INPUT = [
@@ -16,8 +17,10 @@ const NON_NUMERIC_INPUT = [
   'Tab',
 ];
 
+export const NUMERIC_INPUT = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 export const ALLOWED_INPUT = [
-  ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => String(i)),
+  ...NUMERIC_INPUT.map((i) => String(i)),
   ...NON_NUMERIC_INPUT,
 ];
 
@@ -26,9 +29,16 @@ export const INITIAL_HISTORY_STATE: HistoryState = {
   redoStack: [],
 };
 
+export const INITIAL_CELL: Cell = {
+  value: 0,
+  candidates: [],
+  isInitial: false,
+};
+
 export const INITIAL_SUDOKU: GameProps = {
   id: '',
   game: [],
+  cells: [],
   history: INITIAL_HISTORY_STATE,
   solvedGame: [],
   editableCells: [],
@@ -40,6 +50,7 @@ export const INITIAL_SUDOKU: GameProps = {
   gameWon: false,
   status: 'new',
   timerActive: false,
+  notesMode: false,
 };
 
 export const GAME_STATUS = [
@@ -60,12 +71,15 @@ export const INITIAL_GAME_CONTEXT: IGameContext = {
   create: () => {},
   start: () => {},
   clear: () => {},
-  apply: () => {},
+  applyBatch: () => {},
   undo: () => {},
   redo: () => {},
   pause: () => {},
   resume: () => {},
-  mistake: () => {},
+  logMistake: () => {},
+  toggleNotesMode: () => {},
+  toggleCandidate: () => {},
+  clearNotes: () => {},
 };
 
 export const DIFFICULTY = [

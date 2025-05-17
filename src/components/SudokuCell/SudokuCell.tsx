@@ -6,13 +6,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Tooltip, Zoom } from '@mui/material';
+import { Box, Tooltip, Zoom } from '@mui/material';
 import {
   ALLOWED_INPUT,
   CellFocus,
   HintProps,
   ICell,
   ICellRef,
+  NUMERIC_INPUT,
 } from '../../lib/libs/game';
 import { useCandidates } from '../../lib/hooks';
 
@@ -76,77 +77,133 @@ const SudokuCell = forwardRef(function SudokuCell(
     col: x,
     editable,
     board,
+    cell,
     value,
     status,
     onUpdate,
     onActivateFocus,
     onActivateHint,
   } = props;
+  const { value: cellValue, candidates: notes, isInitial } = cell;
 
   const [activeHint, setActiveHint] = useState<HintProps>(null);
   const [focusedCell, setFocusedCell] = useState<CellFocus | null>(null);
 
+  const isFocused = focusedCell?.row === y && focusedCell?.col === x;
   const isComplete = status === 'completed';
   const inputRef = useRef<HTMLInputElement>(null);
   const candidates = useCandidates(board, editable);
   const tooltipTitle = getCandidates(candidates[y][x]);
   const classes = [
     'cell',
-    ...(!editable[y][x] ? ['prefilled'] : [...(isComplete ? ['solved'] : [])]),
+    ...(isInitial ? ['prefilled'] : [...(isComplete ? ['solved'] : [])]),
   ];
 
   useImperativeHandle(ref, () => ({
     activateHint: (row, col) => {
       setActiveHint(candidates[row][col]);
     },
-    getActiveHint: () => activeHint,
-    isActiveHint: () => !!activeHint,
     activateFocus: (row, col) => {
       setFocusedCell({ row, col });
       inputRef.current?.focus();
     },
   }));
 
-  useEffect(() => {}, [
-    activeHint,
-    onActivateHint,
-    focusedCell,
-    onActivateFocus,
-  ]);
+  useEffect(() => {
+    if (focusedCell) {
+      inputRef.current?.focus();
+    }
+  }, [activeHint, focusedCell, onActivateHint, onActivateFocus]);
 
-  return (
-    <Tooltip
-      title={tooltipTitle}
-      placement="top"
-      disableInteractive
-      followCursor
-      slots={{ transition: Zoom }}
-    >
+  if (cellValue) {
+    return (
+      <Tooltip
+        title={tooltipTitle}
+        placement="top"
+        disableInteractive
+        followCursor
+        slots={{ transition: Zoom }}
+      >
+        <div className={classes.join(' ')} data-x={x} data-y={y}>
+          <input
+            ref={inputRef}
+            autoComplete="off"
+            id={`${y}-${x}`}
+            type="text"
+            inputMode="numeric"
+            className="sudoku-cell"
+            maxLength={1}
+            value={value === 0 ? '' : value}
+            onChange={(e) => onUpdate(e, y, x)}
+            onFocus={() => {
+              setActiveHint(candidates[y][x]);
+              setFocusedCell({ row: y, col: x });
+            }}
+            onBlur={() => {
+              setActiveHint(null);
+              setFocusedCell(null);
+            }}
+            onKeyDown={(e) => {
+              if (!ALLOWED_INPUT.includes(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            readOnly={isInitial || isComplete}
+            data-row={y}
+            data-col={x}
+          />
+        </div>
+      </Tooltip>
+    );
+  }
+
+  if (isFocused || !notes.length) {
+    return (
       <div className={classes.join(' ')} data-x={x} data-y={y}>
         <input
           ref={inputRef}
           autoComplete="off"
           id={`${y}-${x}`}
           type="text"
+          inputMode="numeric"
+          className="sudoku-cell"
           maxLength={1}
-          value={value === 0 ? '' : value}
+          value=""
           onChange={(e) => onUpdate(e, y, x)}
           onFocus={() => {
-            setActiveHint(candidates[y][x]);
             setFocusedCell({ row: y, col: x });
           }}
-          onBlur={() => setActiveHint(null)}
+          onBlur={() => setFocusedCell(null)}
           onKeyDown={(e) => {
             if (!ALLOWED_INPUT.includes(e.key)) {
               e.preventDefault();
             }
           }}
-          readOnly={!editable[y][x] || isComplete}
+          readOnly={isInitial || isComplete}
           data-row={y}
           data-col={x}
         />
       </div>
-    </Tooltip>
+    );
+  }
+
+  return (
+    <Box
+      className="sudoku-cell candidates"
+      onClick={() => {
+        setFocusedCell({ row: y, col: x });
+      }}
+    >
+      {NUMERIC_INPUT.map((n) => (
+        <Box
+          key={n}
+          component="span"
+          className={`note candidate${notes.includes(n) ? ' visible' : ''}`}
+        >
+          {notes.includes(n) ? n : ''}
+        </Box>
+      ))}
+    </Box>
   );
 });
 
