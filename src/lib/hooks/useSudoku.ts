@@ -72,8 +72,15 @@ export function sudokuReducer(
 
       // Save current game before creating a new one
       if (currentGame.id && timer && timer.elapsedMs) {
+        // Clear candidates from all cells
+        const { clearCells } = generateClearBoardChanges(
+          deepCopy(currentGame.game),
+          currentGame.editableCells
+        );
+
         const updatedGame: GameProps = {
           ...currentGame,
+          cells: clearCells,
           updatedDate: now,
           status,
           timerActive: false,

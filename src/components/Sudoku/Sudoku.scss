@@ -11,14 +11,13 @@ $grid-size: 9;
     row-gap: 2px;
   }
 
-  .sudoku-cell {
+  .candidates-wrapper {
     background-color: #f0f0f0;
 
     &.candidates {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      font-size: 0.6rem;
       text-align: center;
       padding: 2px;
 
@@ -26,16 +25,26 @@ $grid-size: 9;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #555;
+        font-size: 0.6rem;
+        transition: all 0.3s ease, color 0.3s ease;
+
+        &:not(.visible) {
+          visibility: hidden;
+        }
 
         &.visible {
-          color: #222;
+          color: #fff;
+          font-weight: bold;
+
+          &:hover {
+            cursor: pointer;
+          }
         }
       }
     }
   }
 
-  .cell {
+  .cell-wrapper {
     width: 50px;
     height: 50px;
     background: white;
@@ -108,10 +117,12 @@ $grid-size: 9;
 @for $x from 0 through ($grid-size - 1) {
   @for $y from 0 through ($grid-size - 1) {
     .sudoku-board:has(
-        .cell[data-x='#{$x}'][data-y='#{$y}']:not(.prefilled):focus-within
+        .cell-wrapper[data-x='#{$x}'][data-y='#{$y}']:not(
+            .prefilled
+          ):focus-within
       ) {
-      .cell[data-x='#{$x}'],
-      .cell[data-y='#{$y}'] {
+      .cell-wrapper[data-x='#{$x}'],
+      .cell-wrapper[data-y='#{$y}'] {
         background: rgb(214, 233, 240);
         transition: background 0.3s ease, color 0.3s ease;
 

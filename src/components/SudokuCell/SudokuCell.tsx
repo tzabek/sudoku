@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box, Tooltip, Zoom } from '@mui/material';
+import { Avatar, Box, styled, Tooltip, Zoom } from '@mui/material';
+import { green, pink } from '@mui/material/colors';
 import {
   ALLOWED_INPUT,
   CellFocus,
@@ -16,6 +17,26 @@ import {
   NUMERIC_INPUT,
 } from '../../lib/libs/game';
 import { useCandidates } from '../../lib/hooks';
+
+const Candidate = styled(Avatar)(() => ({
+  width: 12,
+  height: 12,
+  backgroundColor: green[500],
+  '&:hover': {
+    animation: 'ripple 0.75s infinite ease-in-out',
+    backgroundColor: pink[500],
+  },
+  '@keyframes ripple': {
+    '0%': {
+      transform: 'scale(1)',
+      opacity: 1,
+    },
+    '100%': {
+      transform: 'scale(1.5)',
+      opacity: 0.8,
+    },
+  },
+}));
 
 /**
  * Generates a JSX element that displays information about Sudoku cell candidates.
@@ -59,12 +80,6 @@ function getCandidates(candidates: number[] | null) {
  * @method activateHint
  * Activates a hint for the cell at the specified row and column.
  *
- * @method getActiveHint
- * Retrieves the currently active hint for the cell.
- *
- * @method isActiveHint
- * Checks if there is an active hint for the cell.
- *
  * @method activateFocus
  * Activates focus for the cell at the specified row and column after cell update.
  */
@@ -80,6 +95,7 @@ const SudokuCell = forwardRef(function SudokuCell(
     cell,
     value,
     status,
+    isNotesMode,
     onUpdate,
     onActivateFocus,
     onActivateHint,
@@ -95,8 +111,9 @@ const SudokuCell = forwardRef(function SudokuCell(
   const candidates = useCandidates(board, editable);
   const tooltipTitle = getCandidates(candidates[y][x]);
   const classes = [
-    'cell',
+    'cell-wrapper',
     ...(isInitial ? ['prefilled'] : [...(isComplete ? ['solved'] : [])]),
+    ...(isNotesMode ? ['notes-mode-wrapper'] : []),
   ];
 
   useImperativeHandle(ref, () => ({
@@ -115,7 +132,8 @@ const SudokuCell = forwardRef(function SudokuCell(
     }
   }, [activeHint, focusedCell, onActivateHint, onActivateFocus]);
 
-  if (cellValue) {
+  // Standard input cell for entering final number
+  if (cellValue || !isNotesMode) {
     return (
       <Tooltip
         title={tooltipTitle}
@@ -131,10 +149,15 @@ const SudokuCell = forwardRef(function SudokuCell(
             id={`${y}-${x}`}
             type="text"
             inputMode="numeric"
-            className="sudoku-cell"
+            className="sudoku-cell final-input"
             maxLength={1}
             value={value === 0 ? '' : value}
-            onChange={(e) => onUpdate(e, y, x)}
+            onChange={(e) => {
+              const input = Number(e.target.value);
+              const newValue = Number.isNaN(input) ? 0 : input;
+
+              onUpdate(y, x, newValue);
+            }}
             onFocus={() => {
               setActiveHint(candidates[y][x]);
               setFocusedCell({ row: y, col: x });
@@ -148,7 +171,7 @@ const SudokuCell = forwardRef(function SudokuCell(
                 e.preventDefault();
               }
             }}
-            readOnly={isInitial || isComplete}
+            readOnly={isInitial || isComplete || isNotesMode}
             data-row={y}
             data-col={x}
           />
@@ -157,6 +180,7 @@ const SudokuCell = forwardRef(function SudokuCell(
     );
   }
 
+  // Notes input for entering cell candidates
   if (isFocused || !notes.length) {
     return (
       <div className={classes.join(' ')} data-x={x} data-y={y}>
@@ -166,10 +190,15 @@ const SudokuCell = forwardRef(function SudokuCell(
           id={`${y}-${x}`}
           type="text"
           inputMode="numeric"
-          className="sudoku-cell"
+          className="sudoku-cell notes-input"
           maxLength={1}
           value=""
-          onChange={(e) => onUpdate(e, y, x)}
+          onChange={(e) => {
+            const input = Number(e.target.value);
+            const newValue = Number.isNaN(input) ? 0 : input;
+
+            onUpdate(y, x, newValue);
+          }}
           onFocus={() => {
             setFocusedCell({ row: y, col: x });
           }}
@@ -187,21 +216,29 @@ const SudokuCell = forwardRef(function SudokuCell(
     );
   }
 
+  // Cell candidates chosen by user
   return (
     <Box
-      className="sudoku-cell candidates"
+      className="cell-wrapper candidates-wrapper candidates"
       onClick={() => {
         setFocusedCell({ row: y, col: x });
       }}
     >
       {NUMERIC_INPUT.map((n) => (
-        <Box
+        <Candidate
           key={n}
-          component="span"
-          className={`note candidate${notes.includes(n) ? ' visible' : ''}`}
+          variant="square"
+          className={`note sudoku-cell candidate${
+            notes.includes(n) ? ' visible' : ''
+          }`}
+          onClick={() => {
+            if (notes.includes(n)) {
+              onUpdate(y, x, n);
+            }
+          }}
         >
           {notes.includes(n) ? n : ''}
-        </Box>
+        </Candidate>
       ))}
     </Box>
   );

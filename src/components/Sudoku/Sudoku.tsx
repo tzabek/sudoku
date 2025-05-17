@@ -1,4 +1,4 @@
-import { ChangeEvent, createRef, RefObject, use, useRef } from 'react';
+import { createRef, RefObject, use, useRef } from 'react';
 import { Box } from '@mui/material';
 import { SudokuCell, Timer, Toolbar, VictoryModal } from '..';
 import { createChangeBatch, ICellRef } from '../../lib/libs/game';
@@ -65,31 +65,25 @@ function Sudoku() {
     return sudokuCellRef.current.get(key);
   };
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    row: number,
-    col: number
-  ) => {
+  const handleInputChange = (row: number, col: number, val: number) => {
     const newBoard = deepCopy(board);
     const previousValue = board[row][col];
-    const input = Number(e.target.value);
-    const newValue = Number.isNaN(input) ? 0 : input;
 
-    if (previousValue === newValue) {
+    if (previousValue === val) {
       return;
     }
 
     if (notesMode) {
-      toggleCandidate(row, col, newValue);
+      toggleCandidate(row, col, val);
     } else {
-      newBoard[row][col] = newValue;
+      newBoard[row][col] = val;
 
       // Log mistake
-      if (newValue !== solvedGame[row][col]) {
+      if (val !== solvedGame[row][col]) {
         logMistake({
           row,
           col,
-          enteredValue: newValue,
+          enteredValue: val,
           correctValue: solvedGame[row][col],
           timestamp: Date.now(),
         });
@@ -126,8 +120,8 @@ function Sudoku() {
                 cell={cell}
                 value={value}
                 status={status}
-                onUpdate={(e) => {
-                  handleInputChange(e, rowIdx, colIdx);
+                onUpdate={(r, c, v) => {
+                  handleInputChange(r, c, v);
 
                   if (!notesMode) {
                     setTimeout(() => {
@@ -147,6 +141,7 @@ function Sudoku() {
                     ?.get(key)
                     ?.current?.activateHint(rowIdx, colIdx);
                 }}
+                isNotesMode={notesMode}
               />
             );
           })

@@ -1,5 +1,4 @@
 /* eslint-disable import/no-cycle */
-import { ChangeEvent } from 'react';
 import { DIFFICULTY, GAME_STATUS } from '.';
 import { TimerState } from '../timer';
 
@@ -105,17 +104,14 @@ export interface ICell {
   cell: Cell;
   value: number;
   status: GameStatus;
-  onUpdate: (
-    e: ChangeEvent<HTMLInputElement>,
-    row: number,
-    col: number
-  ) => void;
+  onUpdate: (row: number, col: number, val: number) => void;
   onActivateHint: (
     e: React.FocusEvent<HTMLInputElement>,
     row: number,
     col: number
   ) => void;
   onActivateFocus: (row: number, col: number) => void;
+  isNotesMode: boolean;
 }
 
 export interface ICellRef {

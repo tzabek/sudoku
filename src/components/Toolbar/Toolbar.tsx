@@ -163,7 +163,7 @@ ToolbarModes.displayName = 'ToolbarModes';
 
 function ToolbarProgress() {
   const { game, undo, redo, resume, pause } = use(GameContext);
-  const { history, status } = game;
+  const { history, status, notesMode } = game;
   const { undoStack, redoStack } = history;
 
   return (
@@ -192,7 +192,7 @@ function ToolbarProgress() {
       <IconButton
         aria-label="Undo"
         size="small"
-        disabled={!undoStack.length || status === 'completed'}
+        disabled={!undoStack.length || status === 'completed' || notesMode}
         sx={{ borderRadius: 0 }}
         onClick={() => undo()}
       >
@@ -202,7 +202,7 @@ function ToolbarProgress() {
       <IconButton
         aria-label="Redo"
         size="small"
-        disabled={!redoStack.length || status === 'completed'}
+        disabled={!redoStack.length || status === 'completed' || notesMode}
         sx={{ borderRadius: 0 }}
         onClick={() => redo()}
       >
