@@ -1,15 +1,6 @@
-import { ChangeEvent, createRef, RefObject, use, useRef } from 'react';
-import { Box, Divider, IconButton } from '@mui/material';
-import {
-  Undo,
-  Redo,
-  Pause,
-  PlayArrow,
-  DashboardCustomize,
-  SystemUpdateAlt,
-  GridView,
-} from '@mui/icons-material';
-import { SudokuCell, Timer, VictoryModal } from '..';
+import { createRef, RefObject, use, useRef } from 'react';
+import { Box } from '@mui/material';
+import { SudokuCell, Timer, Toolbar, VictoryModal } from '..';
 import { createChangeBatch, ICellRef } from '../../lib/libs/game';
 import { deepCopy } from '../../lib/libs/shared';
 
@@ -47,12 +38,24 @@ import './Sudoku.scss';
  * - `Timer`: Displays the elapsed time for the game.
  * - `SudokuCell`: Renders each cell in the Sudoku board.
  * - `VictoryModal`: Displays a modal when the game is won.
+ * - `Toolbar`: Renders a toolbar for game actions
  */
 function Sudoku() {
-  const { game, start, clear, apply, undo, redo, mistake, resume, pause } =
-    use(GameContext);
-  const { game: board, editableCells, solvedGame, history, status } = game;
-  const { undoStack, redoStack } = history;
+  const {
+    game,
+    applyBatch,
+    logMistake,
+    toggleCandidate,
+    removeCandidateFromPeers,
+  } = use(GameContext);
+  const {
+    game: board,
+    cells,
+    editableCells,
+    solvedGame,
+    status,
+    notesMode,
+  } = game;
 
   const sudokuCellRef = useRef<Map<string, RefObject<ICellRef | null>>>(
     new Map()
@@ -68,35 +71,36 @@ function Sudoku() {
     return sudokuCellRef.current.get(key);
   };
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    row: number,
-    col: number
-  ) => {
+  const handleInputChange = (row: number, col: number, val: number) => {
     const newBoard = deepCopy(board);
     const previousValue = board[row][col];
-    const input = Number(e.target.value);
-    const newValue = Number.isNaN(input) ? 0 : input;
 
-    if (previousValue === newValue) {
+    if (previousValue === val) {
       return;
     }
 
-    newBoard[row][col] = newValue;
+    if (notesMode) {
+      toggleCandidate(row, col, val);
+    } else {
+      newBoard[row][col] = val;
 
-    // Log mistake
-    if (newValue !== solvedGame[row][col]) {
-      mistake({
-        row,
-        col,
-        enteredValue: newValue,
-        correctValue: solvedGame[row][col],
-        timestamp: Date.now(),
-      });
+      // Log mistake
+      if (val !== solvedGame[row][col]) {
+        logMistake({
+          row,
+          col,
+          enteredValue: val,
+          correctValue: solvedGame[row][col],
+          timestamp: Date.now(),
+        });
+      }
+
+      // Apply changes
+      applyBatch(createChangeBatch(board, newBoard));
+
+      // Remove candidate from peers
+      removeCandidateFromPeers(row, col, val);
     }
-
-    // Apply changes
-    apply(createChangeBatch(board, newBoard));
   };
 
   return (
@@ -105,102 +109,14 @@ function Sudoku() {
       <Timer />
 
       {/* Sudoku Toolbar */}
-      <Box
-        component="section"
-        id="game-toolbar"
-        className="sudoku-toolbar"
-        sx={{ display: 'flex' }}
-      >
-        <Box
-          className="actions-toolbar"
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2,
-            bgcolor: 'background.paper',
-            color: 'text.secondary',
-            marginRight: 'auto',
-          }}
-        >
-          <IconButton
-            aria-label="Start new"
-            size="small"
-            sx={{ borderRadius: 0 }}
-            onClick={() => start()}
-          >
-            <DashboardCustomize />
-          </IconButton>
-          <Divider orientation="vertical" variant="middle" flexItem />
-          <IconButton
-            aria-label="Load game"
-            size="small"
-            sx={{ borderRadius: 0 }}
-          >
-            <SystemUpdateAlt />
-          </IconButton>
-          <Divider orientation="vertical" variant="middle" flexItem />
-          <IconButton
-            aria-label="Clear board"
-            size="small"
-            sx={{ borderRadius: 0 }}
-            onClick={() => clear(game)}
-          >
-            <GridView />
-          </IconButton>
-        </Box>
-        <Box
-          className="progress-toolbar"
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2,
-            bgcolor: 'background.paper',
-            color: 'text.secondary',
-            marginLeft: 'auto',
-          }}
-        >
-          <IconButton
-            aria-label={game.status === 'paused' ? 'Resume' : 'Pause'}
-            size="small"
-            sx={{ borderRadius: 0 }}
-            onClick={() =>
-              game.status === 'paused' ? resume(game) : pause(game)
-            }
-          >
-            {game.status === 'paused' ? <PlayArrow /> : <Pause />}
-          </IconButton>
-          <Divider orientation="vertical" variant="middle" flexItem />
-          <IconButton
-            aria-label="Undo"
-            size="small"
-            disabled={!undoStack.length || status === 'completed'}
-            sx={{ borderRadius: 0 }}
-            onClick={() => undo()}
-          >
-            <Undo />
-          </IconButton>
-          <Divider orientation="vertical" variant="middle" flexItem />
-          <IconButton
-            aria-label="Redo"
-            size="small"
-            disabled={!redoStack.length || status === 'completed'}
-            sx={{ borderRadius: 0 }}
-            onClick={() => redo()}
-          >
-            <Redo />
-          </IconButton>
-        </Box>
-      </Box>
+      <Toolbar />
 
       {/* Sudoku Board */}
       <Box component="section" id="board" className="sudoku-board">
         {board.map((row, rowIdx) =>
           row.map((value, colIdx) => {
             const key = `${rowIdx}-${colIdx}`;
+            const cell = cells[rowIdx][colIdx];
 
             return (
               <SudokuCell
@@ -210,15 +126,20 @@ function Sudoku() {
                 row={rowIdx}
                 editable={editableCells}
                 board={board}
+                cell={cell}
                 value={value}
                 status={status}
-                onUpdate={(e) => {
-                  handleInputChange(e, rowIdx, colIdx);
-                  setTimeout(() => {
-                    sudokuCellRef.current
-                      ?.get(key)
-                      ?.current?.activateFocus(rowIdx, colIdx);
-                  });
+                onUpdate={(r, c, v) => {
+                  handleInputChange(r, c, v);
+
+                  // Don't re-focus in 'notes mode'
+                  if (!notesMode) {
+                    setTimeout(() => {
+                      sudokuCellRef.current
+                        ?.get(key)
+                        ?.current?.activateFocus(rowIdx, colIdx);
+                    });
+                  }
                 }}
                 onActivateFocus={() => {
                   sudokuCellRef.current
@@ -230,6 +151,7 @@ function Sudoku() {
                     ?.get(key)
                     ?.current?.activateHint(rowIdx, colIdx);
                 }}
+                isNotesMode={notesMode}
               />
             );
           })

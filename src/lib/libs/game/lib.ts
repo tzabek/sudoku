@@ -65,7 +65,7 @@ export function loadGame(gameId: string) {
 export function createGame() {
   const sudoku = createSudoku();
 
-  const { board: game, solution: solvedGame } = sudoku.generate();
+  const { board: game, cells, solution: solvedGame } = sudoku.generate();
   const { editable: editableCells } = sudoku.start(game);
 
   const now = Date.now();
@@ -73,6 +73,7 @@ export function createGame() {
   const newState: GameProps = {
     id,
     game,
+    cells,
     history: INITIAL_HISTORY_STATE,
     solvedGame,
     editableCells,
@@ -84,6 +85,7 @@ export function createGame() {
     gameWon: false,
     status: 'progress',
     timerActive: true,
+    notesMode: false,
   };
 
   return newState;
@@ -144,7 +146,9 @@ export function generateClearBoardChanges(board: Board, editable: Editable) {
     }
   }
 
-  return { changes, clearBoard };
+  const clearCells = sudoku.createEnhancedBoard(clearBoard);
+
+  return { changes, clearBoard, clearCells };
 }
 
 /**
